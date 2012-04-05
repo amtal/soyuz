@@ -8,9 +8,13 @@ import Data.Word
 -- | Instruction size in words.
 --
 -- Each word is 16 bits. Instructions are always 1, 2, or 3 words in length.
+-- 
+-- Comments and labels don't appear in machine code.
 size :: Instruction -> Word16
 size (Basic _ a b)  = 1 + ops a + ops b
 size (NonBasic _ a) = 2 + ops a
+size (Comment _) = 0
+size (Label _) = 0
 
 -- | Operand size.
 ops :: Operand -> Word16
