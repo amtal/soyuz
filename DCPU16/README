@@ -1,0 +1,8 @@
+Work in progress, stay tuned...
+
+Thus far, I've got:
+* abstract instruction set representation
+* machine code encode/decode
+* assembly parse/pretty-print
+
+Needs some finishing touches, then can write optimizing assembler.
