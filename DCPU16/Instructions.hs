@@ -29,7 +29,7 @@ data BasicOp
     deriving (Eq,Read,Show)
 
 data NonBasicOp
-    = JSR Word
+    = JSR
     | Reserved Word16 -- ^ Opcode not defined yet.
     deriving (Eq,Read,Show)
 
