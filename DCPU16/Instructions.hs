@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 -- | Complete abstract description of the DCPU-16 instruction set.
 --
 -- Based on Version 1.1 of the DCPU-16 Specification by Mojang, retrieved from 0x10c.com.
@@ -9,6 +10,7 @@ module DCPU16.Instructions
     ) where
 -- Fundamental types
 import Data.Word hiding (Word)
+import Data.Data
 import Data.ByteString
 -- Serialization
 import Data.Serialize
@@ -26,7 +28,7 @@ data Instruction
     | Data Word
     | Label ByteString -- ^ Not present in machine code, for assembler utility only.
     | Comment String -- ^ Might as well include these.
-    deriving (Eq,Read,Show)
+    deriving (Eq,Read,Show,Data,Typeable)
 
 data BasicOp
     = SET
@@ -39,12 +41,12 @@ data BasicOp
     | IFN
     | IFG
     | IFB
-    deriving (Eq,Read,Show)
+    deriving (Eq,Read,Show,Data,Typeable)
 
 data NonBasicOp
     = JSR
     | Reserved Word16 -- ^ Opcode not defined yet.
-    deriving (Eq,Read,Show)
+    deriving (Eq,Read,Show,Data,Typeable)
 
 -- | Values instructions operate on.
 --
@@ -61,10 +63,10 @@ data Operand
     | IndirectLiteral Word
     | DirectLiteral Word
     | ShortLiteral Word -- ^ Restricted to 0x00-0x1f, 5 bits.
-    deriving (Eq,Read,Show)
+    deriving (Eq,Read,Show,Data,Typeable)
 
 data Register = A|B|C|X|Y|Z|I|J
-    deriving (Eq,Read,Show,Enum)
+    deriving (Eq,Read,Show,Data,Typeable,Enum)
 
 -- | Constant data.
 --
@@ -73,7 +75,7 @@ data Register = A|B|C|X|Y|Z|I|J
 data Word 
     = Const Word16 
     | LabelAddr ByteString 
-    deriving (Eq,Read,Show)
+    deriving (Eq,Read,Show,Data,Typeable)
 
 
 
