@@ -18,7 +18,15 @@ import Data.ByteString.Char8
 
 parseFile = parseFromFile asm
 
-asm = spaces >> (many . lexeme . choice $ [instruction, label, comment]) <* eof
+asm = spaces >> instructs <* end where
+    instructs = many . lexeme . choice $ [instruction, label, comment, dat]
+    end = (eof <?> "comment, end of file, or valid instruction")
+
+-- | For now, data only handles one word. 
+--
+-- Will figure out good syntax sugar (and refactor "asm" to handle multi-word)
+-- later.
+dat = try $ Data <$ symbol "dat" <*> word
 
 label = Label <$ char ':' <*> labelName <* spaces
 
