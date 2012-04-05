@@ -1,6 +1,9 @@
 -- | DCPU-16 instruction execution time in cycles.
-module DCPU16.Instructions.Size where
-import Instructions
+module DCPU16.Instructions.Time 
+    ( time
+    ) where
+import DCPU16.Instructions
+import Data.List (elem)
 import Data.Word
 
 -- | Instruction execution time in cycles.
@@ -22,9 +25,9 @@ time (NonBasic JSR a) = 2 + opc a
 --
 -- Doesn't take 1-cycle failed comparison penalty into account for IF?.
 baseCost :: BasicOp -> Int
-baseCost op | op `member` [SET,AND,BOR,XOR, IFE,IFN,IFG,IFB] = 1
-            | op `member` [ADD,SUB,MUL,SHR,SHL] = 2
-            | op `member` [DIV,MOD] = 3
+baseCost op | op `elem` [SET,AND,BOR,XOR, IFE,IFN,IFG,IFB] = 1
+            | op `elem` [ADD,SUB,MUL,SHR,SHL] = 2
+            | op `elem` [DIV,MOD] = 3
 
 -- | Operand cycle cost.
 --
@@ -33,7 +36,7 @@ baseCost op | op `member` [SET,AND,BOR,XOR, IFE,IFN,IFG,IFB] = 1
 -- Oddly, there is no cost for accessing indirect addresses. Either a
 -- simplification or oversight.
 opc :: Operand -> Int
-ops (Offset _)  = 1
-ops IndirectLiteral= 1
-ops DirectLiteral  = 1
-ops _ = 0
+opc (Offset _ _)        = 1
+opc (IndirectLiteral _) = 1
+opc (DirectLiteral _)   = 1
+opc _ = 0

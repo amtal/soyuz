@@ -1,6 +1,8 @@
 -- | DCPU-16 instruction size in memory.
-module DCPU16.Instructions.Size where
-import Instructions
+module DCPU16.Instructions.Size 
+    ( size
+    ) where
+import DCPU16.Instructions
 import Data.Word
 
 -- | Instruction size in words.

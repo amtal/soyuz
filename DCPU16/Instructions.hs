@@ -2,12 +2,17 @@
 --
 -- Based on Version 1.1 of the DCPU-16 Specification by Mojang, retrieved from 0x10c.com.
 --
--- Contains a trivial "Label" extension, which isn't present in machine code
+-- Contains a trivial 'Label' extension, which isn't present in machine code
 -- but is useful for dealing with assembly.
-module DCPU16.Instructions where
+module DCPU16.Instructions
+    ( Instruction(..), BasicOp(..), NonBasicOp(..), Operand(..), Register(..), Word(..)
+    ) where
 import Data.Word hiding (Word)
 import Data.ByteString
 
+-- | Abstract DCPU-16 instruction set.
+--
+-- Can be read and written as machine code via the Serialize instance.
 data Instruction 
     = Basic BasicOp Operand Operand
     | NonBasic NonBasicOp Operand

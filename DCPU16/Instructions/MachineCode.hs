@@ -1,9 +1,11 @@
 -- | DCPU-16 instruction encoding.
 --
+-- Defines an instance of Serialize for Instruction.
+--
 -- Rather crude for now, needs refactoring to use a bit-aware packer. And
 -- general cleanup.
 module DCPU16.Instructions.MachineCode
-    ( Serialize(..)
+    ( 
     ) where
 import DCPU16.Instructions
 import Data.Serialize
