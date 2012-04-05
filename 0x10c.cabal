@@ -23,7 +23,9 @@ flag split-base
 
 library
   exposed-modules:
+        DCPU16.Assembler.Parser
+        DCPU16.Assembler.Printer
         DCPU16.Instructions
         DCPU16.Instructions.Size
         DCPU16.Instructions.Time
-  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate, cereal, bytestring
+  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate, cereal, bytestring, trifecta, pretty
