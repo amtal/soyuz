@@ -22,14 +22,16 @@ import Data.Word (Word16)
 
 -- | Nicely formatted ASCII output.
 pprint :: [Instruction] -> String
-pprint = render . foldr pI empty
+pprint = render . foldl pI empty
 
-pI :: Instruction -> Doc -> Doc
-pI (Comment solo xs) acc= acc $$ semi <> text xs
-pI (Label s) acc        = acc $$ colon <> text (unpack s)
-pI (Data x) acc         = acc $$ nest 16 (text "dat" <+> pW x)
-pI (Basic op a b) acc   = acc $$ nest 16 (pBO op <+> pO a <> comma <+> pO b)
-pI (NonBasic op a) acc  = acc $$ nest 16 (pNBO op <+> pO a)
+pI :: Doc -> Instruction -> Doc
+pI acc (Comment solo xs) 
+    | solo==False = acc $$ nest 40 (semi <> text xs)
+    | otherwise   = acc $+$ semi <> text xs
+pI acc (Label s)  = acc $$ colon <> text (unpack s)
+pI acc (Data x)   = acc $$ nest 16 (text "dat" <+> pW x)
+pI acc (Basic op a b) = acc $$ nest 16 (pBO op <+> pO a <> comma <+> pO b)
+pI acc (NonBasic op a)= acc $$ nest 16 (pNBO op <+> pO a)
 
 pW (Const x) = pHex "0x%x" x
 pW (LabelAddr s) = text $ show s
