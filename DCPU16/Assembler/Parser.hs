@@ -14,10 +14,12 @@ module DCPU16.Assembler.Parser
 import Text.Trifecta hiding (Pop,Push)
 import Control.Applicative hiding (Const)
 import DCPU16.Instructions
-import Data.ByteString.Char8
+import qualified Data.ByteString.Char8 as B
+import Debug.Trace
 
 parseFile = parseFromFile asm
 
+asm :: Parser String [Instruction]
 asm = spaces >> instructs <* end where
     instructs = many . lexeme . choice $ [instruction, label, comment, dat]
     end = (eof <?> "comment, end of file, or valid instruction")
@@ -30,13 +32,18 @@ dat = try $ Data <$ symbol "dat" <*> word
 
 label = Label <$ char ':' <*> labelName <* spaces
 
-labelName = pack `fmap` some labelChars
+labelName = B.pack `fmap` some labelChars
 
 labelChars = alphaNum 
 
-comment = Comment False <$ char ';' <*> manyTill anyChar eofOrNewline where
+comment = do
+    char ';'
+    l <- line
+    Comment (B.head l == ';') <$> manyTill anyChar eofOrNewline 
+  where
     eofOrNewline = ((try newline >> return ()) <|> eof)
 
+instruction :: Parser String Instruction
 instruction = choice
     [ Basic <$> basicOp <*> operand <* comma <*> operand
     , NonBasic JSR <$ symbol "jsr" <*> operand
