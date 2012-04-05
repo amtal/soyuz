@@ -1,10 +1,22 @@
 {-# LANGUAGE OverloadedStrings #-}
+-- | Parser for what seems to be DCPU16 assembly.
+--
+-- There is some ambiguity between sources: the specification uses uppercase a
+-- lot (which I'd rather put in as an option later, with the strict
+-- implementation being default).
+--
+-- A screenshot also shows indirect mode being done with [] instead of (). Go
+-- figure.
+module DCPU16.Assembler.Parser
+    ( asm
+    , parseFile
+    ) where
 import Text.Trifecta hiding (Pop,Push)
 import Control.Applicative hiding (Const)
 import DCPU16.Instructions
 import Data.ByteString.Char8
 
-test = parseFromFile asm
+parseFile = parseFromFile asm
 
 asm = spaces >> (many . lexeme . choice $ [instruction, label, comment]) <* eof
 
@@ -32,6 +44,7 @@ operand = choice
     , sym O "o"
     , try $ Direct <$> register
     , try $ Indirect <$> brackets register
+    , try $ brackets (Offset <$> word <* symbol "+" <*> register)
     , DirectLiteral <$> word
     , IndirectLiteral <$> brackets word
     ]
