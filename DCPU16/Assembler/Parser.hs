@@ -34,7 +34,7 @@ labelName = pack `fmap` some labelChars
 
 labelChars = alphaNum 
 
-comment = Comment <$ char ';' <*> manyTill anyChar eofOrNewline where
+comment = Comment False <$ char ';' <*> manyTill anyChar eofOrNewline where
     eofOrNewline = ((try newline >> return ()) <|> eof)
 
 instruction = choice

@@ -27,7 +27,7 @@ data Instruction
     | NonBasic NonBasicOp Operand
     | Data Word
     | Label ByteString -- ^ Not present in machine code, for assembler utility only.
-    | Comment String -- ^ Might as well include these.
+    | Comment Bool String -- ^ Boolean true if comment is alone on its own line.
     deriving (Eq,Read,Show,Data,Typeable)
 
 data BasicOp

@@ -13,7 +13,7 @@ import Data.Word
 size :: Instruction -> Word16
 size (Basic _ a b)  = 1 + ops a + ops b
 size (NonBasic _ a) = 2 + ops a
-size (Comment _) = 0
+size (Comment _ _) = 0
 size (Label _) = 0
 
 -- | Operand size.
