@@ -28,7 +28,7 @@ asm = spaces >> instructs <* end where
 --
 -- Will figure out good syntax sugar (and refactor "asm" to handle multi-word)
 -- later.
-dat = try $ Data <$ symbol "dat" <*> word
+dat = Data <$ symbol "dat" <*> word
 
 label = Label <$ char ':' <*> labelName <* spaces
 
@@ -57,7 +57,7 @@ operand = choice
     , sym SP "sp"
     , sym PC "pc"
     , sym O "o"
-    , try $ Direct <$> register
+    , Direct <$> register
     , try $ Indirect <$> brackets register
     , try $ brackets (Offset <$> word <* symbol "+" <*> register)
     , DirectLiteral <$> word
@@ -70,17 +70,17 @@ word = lexeme $ choice
     ]
 
 int = fromIntegral <$> choice
-    [ try $ symbol "0" >> hexadecimal
+    [ try $ (char '0' <?> "\"0x\"") >> hexadecimal
     , decimal
     ]
 
-sym i tok = i <$ symbol tok
+sym i tok = try $ i <$ string tok <* notFollowedBy labelChars <* spaces
 
 register = try $ choice
     [ sym A "a", sym B "b", sym C "c"
     , sym X "x", sym Y "y", sym Z "z"
     , sym I "i", sym J "j"
-    ] <* notFollowedBy labelChars
+    ] 
 
 basicOp = choice
     [ sym SET "set", sym ADD "add", sym SUB "sub"
@@ -88,5 +88,4 @@ basicOp = choice
     , sym SHR "shr", sym AND "and", sym BOR "bor", sym XOR "xor"
     , sym IFE "ife", sym IFN "ifn", sym IFG "ifg", sym IFB "ifb"
     ]
-  where
-    sym i tok = i <$ symbol tok
+
