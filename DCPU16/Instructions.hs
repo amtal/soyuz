@@ -2,18 +2,18 @@
 --
 -- Based on Version 1.1 of the DCPU-16 Specification by Mojang, retrieved from 0x10c.com.
 --
--- Contains a trivial "Label" extension, which has no effect on machine code
--- but is useful for writing assemblers.
+-- Contains a trivial "Label" extension, which isn't present in machine code
+-- but is useful for dealing with assembly.
 module DCPU16.Instructions where
 import Data.Word
+import Data.ByteString
 
 data Instruction 
     = Basic BasicOp Operand Operand
     | NonBasic NonBasicOp Operand
-    | Data Word16
-    | Label Word16 -- ^ Not present in machine code, for assembler utility only.
+    | Data Word
+    | Label ByteString -- ^ Not present in machine code, for assembler utility only.
     deriving (Eq,Read,Show)
-    
 
 data BasicOp
     = SET
@@ -40,15 +40,25 @@ data NonBasicOp
 -- Indirect operands treat that value as an address for a specific word in memory.
 data Operand
     = Direct Register
-    | Indirect Register
-    | Offset Register
+    | Indirect Register -- ^ At address [register].
+    | Offset Word Register -- ^ At address [next word + register].
     | Pop | Peek | Push
     | SP | PC 
     | O -- ^ Overflow.
-    | NextIndirect
-    | NextDirect
-    | Literal Word16 -- ^ Restricted to 0x00-0x1f, 5 bits.
+    | NextIndirect Word
+    | NextDirect Word
+    | ShortLiteral Word -- ^ Restricted to 0x00-0x1f, 5 bits.
     deriving (Eq,Read,Show)
 
 data Register = A|B|C|X|Y|Z|I|J
     deriving (Eq,Read,Show)
+
+-- | Constant data.
+--
+-- Assembly may use adresses of labels to initialize such data: since the
+-- address may not be known immediately, the label extension is added.
+data Word 
+    = Const Word16 
+    | Label ByteString 
+    deriving (Eq,Read,Show)
+

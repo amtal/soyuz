@@ -7,12 +7,12 @@ import Data.Word
 --
 -- Each word is 16 bits. Instructions are always 1, 2, or 3 words in length.
 size :: Instruction -> Word16
-size (Basic _ a b) = 1 + ops a + ops b
+size (Basic _ a b)  = 1 + ops a + ops b
 size (NonBasic _ a) = 2 + ops a
 
 -- | Operand size.
 ops :: Operand -> Word16
-ops (Offset _)  = 1
-ops NextIndirect= 1
-ops NextDirect  = 1
+ops (Offset _ _)     = 1
+ops (NextIndirect _) = 1
+ops (NextDirect _)   = 1
 ops _ = 0
