@@ -5,7 +5,7 @@
 -- Contains a trivial "Label" extension, which isn't present in machine code
 -- but is useful for dealing with assembly.
 module DCPU16.Instructions where
-import Data.Word
+import Data.Word hiding (Word)
 import Data.ByteString
 
 data Instruction 
@@ -29,7 +29,7 @@ data BasicOp
     deriving (Eq,Read,Show)
 
 data NonBasicOp
-    = JSR
+    = JSR Word
     | Reserved Word16 -- ^ Opcode not defined yet.
     deriving (Eq,Read,Show)
 
@@ -45,13 +45,13 @@ data Operand
     | Pop | Peek | Push
     | SP | PC 
     | O -- ^ Overflow.
-    | NextIndirect Word
-    | NextDirect Word
+    | IndirectLiteral Word
+    | DirectLiteral Word
     | ShortLiteral Word -- ^ Restricted to 0x00-0x1f, 5 bits.
     deriving (Eq,Read,Show)
 
 data Register = A|B|C|X|Y|Z|I|J
-    deriving (Eq,Read,Show)
+    deriving (Eq,Read,Show,Enum)
 
 -- | Constant data.
 --
@@ -59,6 +59,6 @@ data Register = A|B|C|X|Y|Z|I|J
 -- address may not be known immediately, the label extension is added.
 data Word 
     = Const Word16 
-    | Label ByteString 
+    | LabelAddr ByteString 
     deriving (Eq,Read,Show)
 

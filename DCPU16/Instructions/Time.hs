@@ -34,6 +34,6 @@ baseCost op | op `member` [SET,AND,BOR,XOR, IFE,IFN,IFG,IFB] = 1
 -- simplification or oversight.
 opc :: Operand -> Int
 ops (Offset _)  = 1
-ops NextIndirect= 1
-ops NextDirect  = 1
+ops IndirectLiteral= 1
+ops DirectLiteral  = 1
 ops _ = 0

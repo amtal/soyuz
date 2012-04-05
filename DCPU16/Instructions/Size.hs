@@ -13,6 +13,6 @@ size (NonBasic _ a) = 2 + ops a
 -- | Operand size.
 ops :: Operand -> Word16
 ops (Offset _ _)     = 1
-ops (NextIndirect _) = 1
-ops (NextDirect _)   = 1
+ops (IndirectLiteral _) = 1
+ops (DirectLiteral _)   = 1
 ops _ = 0

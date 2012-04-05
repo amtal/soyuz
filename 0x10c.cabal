@@ -26,4 +26,4 @@ library
         DCPU16.Instructions
         DCPU16.Instructions.Size
         DCPU16.Instructions.Time
-  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate
+  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate, cereal
