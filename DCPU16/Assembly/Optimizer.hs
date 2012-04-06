@@ -1,8 +1,8 @@
 -- | Simple assembly optimizations.
 --
 -- Focus on small tweaks, like shortening instructions with small literals, 
--- and any NOP/call/arithmetic optimizations that come up.
-module DCPU16.Assembler.Optimizer 
+-- and any NOP\/call\/arithmetic optimizations that come up.
+module DCPU16.Assembly.Optimizer 
     ( sizeVariant
     ) where
 import DCPU16.Instructions
@@ -15,6 +15,9 @@ import qualified Data.Vector as V
 import Data.Generics.Uniplate.Data
 import qualified Data.Map as M
 
+-- | Optimizations that change the size of instructions, but not order.
+--
+-- Should be run before label-to-address translation.
 sizeVariant :: Vector Instruction -> Vector Instruction
 sizeVariant = shortLabelLiterals -- compress any low label adresses
             . shortLiterals -- compress the easy bits

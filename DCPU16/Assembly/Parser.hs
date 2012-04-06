@@ -7,9 +7,8 @@
 --
 -- A screenshot also shows indirect mode being done with [] instead of (). Go
 -- figure.
-module DCPU16.Assembler.Parser
+module DCPU16.Assembly.Parser
     ( parseFile
-    , asm
     ) where
 import Text.Trifecta hiding (Pop,Push)
 import Control.Applicative hiding (Const)

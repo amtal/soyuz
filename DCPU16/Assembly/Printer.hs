@@ -10,7 +10,7 @@
 --  * I saw a screenshot that used () for indirect rather than [].
 --
 --  * Output is lower case.
-module DCPU16.Assembler.Printer 
+module DCPU16.Assembly.Printer 
     ( pprint
     ) where
 import DCPU16.Instructions

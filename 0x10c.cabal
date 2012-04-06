@@ -12,6 +12,8 @@ description:
         .
         Meant to be a library for implementing powerful tools. As demonstrations, contains
         a command-line optimizing assembler, disassembler, and debugging interpreter.
+        .
+        Core of the library is "DCPU16.Instructions". Everything else is built around it.
 build-type: Simple
 cabal-version: >= 1.4
 license-file: LICENSE
@@ -23,9 +25,10 @@ flag split-base
 
 library
   exposed-modules:
-        DCPU16.Assembler.Parser
-        DCPU16.Assembler.Printer
+        DCPU16.Assembly.Parser
+        DCPU16.Assembly.Printer
+        DCPU16.Assembly.Optimizer
         DCPU16.Instructions
         DCPU16.Instructions.Size
         DCPU16.Instructions.Time
-  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate, cereal, bytestring, trifecta, pretty
+  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate, cereal, bytestring, trifecta, pretty, containers
