@@ -21,6 +21,11 @@ test.masm:2:19: error: expected: "0", "[",
               set #a, 0x30              ; 7c01 0030 
                   ^                                 
 Nothing
+*DCPU16.Assembler.Parser> parseFile "lower.masm"
+lower.masm:14:29: error: label "lop" not defined
+                 set pc, lop          ; 7dc1 000d [*] 
+                            ^                         
+Nothing
 *DCPU16.Assembler.Parser> 
 ```
 

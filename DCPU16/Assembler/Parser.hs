@@ -8,29 +8,61 @@
 -- A screenshot also shows indirect mode being done with [] instead of (). Go
 -- figure.
 module DCPU16.Assembler.Parser
-    ( asm
-    , parseFile
+    ( parseFile
+    , asm
     ) where
 import Text.Trifecta hiding (Pop,Push)
 import Control.Applicative hiding (Const)
 import DCPU16.Instructions
+import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as B
-import Debug.Trace
 import Data.Vector (Vector)
 import qualified Data.Vector as V
+import Control.Monad (guard)
+import Data.Generics.Uniplate.Data
 
-parseFile = parseFromFile asm
 
-asm :: Parser String (Vector Instruction)
-asm = V.fromList `fmap` (spaces >> instructs <* end) where
-    instructs = many . lexeme . choice $ [instruction, label, comment, dat]
-    end = (eof <?> "comment, end of file, or valid instruction")
+-- | Parsing options.
+data Opt = Opt
+    { optSymbols :: (Vector ByteString)
+    } deriving (Read,Show,Eq)
+
+parseFile f = do
+    (Just syms) <- parseFromFile symbolDefs f
+    parseFromFile (asm (Opt syms)) f
+
+
+symbolDefs :: Parser String (Vector ByteString)
+-- | Label definition only parser.
+--
+-- Meant to be run as the first pass, to extract a table to check label uses
+-- against in a future pass.
+symbolDefs = process `fmap` (spaces >> ls <* end) where
+    -- labels appear at the start of lines: 
+    -- if something un-label-like seen, skip to next line
+    ls = many . lexeme . choice $ [label,nextLine]
+    nextLine = (Data (Const 0)) <$ skipSome (satisfy notMark)
+    notMark c = c/='\n'
+    process = V.fromList . map (\(Label s)->s) . filter isLabel
+    isLabel (Label _) = True
+    isLabel _ = False
+
+
+-- | Instruction, comment, and label parser.
+--
+-- Relies on a symbol table parsed in a previous pass to check for label
+-- existance.
+asm :: Opt -> Parser String (Vector Instruction)
+asm o = V.fromList `fmap` (spaces >> instructs <* end) where
+    instructs = many . lexeme . choice $ [instruction o, label, comment, dat o]
+
+end = (eof <?> "comment, end of file, or valid instruction")
 
 -- | For now, data only handles one word. 
 --
 -- Will figure out good syntax sugar (and refactor "asm" to handle multi-word)
 -- later.
-dat = Data <$ symbol "dat" <*> word
+dat o = Data <$ symbol "dat" <*> word o
 
 label = Label <$ char ':' <*> labelName <* spaces
 
@@ -45,14 +77,15 @@ comment = do
   where
     eofOrNewline = ((try newline >> return ()) <|> eof)
 
-instruction :: Parser String Instruction
-instruction = choice
-    [ Basic <$> basicOp <*> operand <* comma <*> operand
-    , NonBasic JSR <$ symbol "jsr" <*> operand
+instruction :: Opt -> Parser String Instruction
+instruction o = choice
+    [ Basic <$> basicOp <*> operand o <* comma <*> operand o
+    , NonBasic JSR <$ symbol "jsr" <*> operand o
     ]
 
 
-operand = choice
+operand :: Opt -> Parser String Operand
+operand o = choice
     [ sym Pop "pop"
     , sym Peek "peek"
     , sym Push "push"
@@ -61,15 +94,24 @@ operand = choice
     , sym O "o"
     , Direct <$> register
     , try $ Indirect <$> brackets register
-    , try $ brackets (Offset <$> word <* symbol "+" <*> register)
-    , DirectLiteral <$> word
-    , IndirectLiteral <$> brackets word
+    , try $ brackets (Offset <$> word o <* symbol "+" <*> register)
+    , DirectLiteral <$> word o
+    , IndirectLiteral <$> brackets (word o)
     ]
     
-word = lexeme $ choice
+word :: Opt -> Parser String Word
+word o = lexeme $ choice
     [ Const <$> int
-    , LabelAddr <$> labelName
-    ]
+    , definedLabel
+    ] 
+  where
+    definedLabel = do
+        s <- labelName
+        case (s `V.elem` (optSymbols o)) of
+            True -> return ()
+            False -> err [] $ "label "++show s++" not defined"
+        return $ LabelAddr s
+
 
 int = fromIntegral <$> choice
     [ try $ (char '0' <?> "\"0x\"") >> hexadecimal
