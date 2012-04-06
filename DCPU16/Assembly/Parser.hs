@@ -19,6 +19,7 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as B
 import Data.Vector (Vector)
 import qualified Data.Vector as V
+import Data.Char (toUpper)
 
 -- | Parsing options.
 data Options = Options
@@ -95,7 +96,7 @@ comment = do
 instruction :: Opt -> Parser String Instruction
 instruction o = choice
     [ Basic <$> basicOp o <*> operand o <* comma <*> operand o
-    , NonBasic JSR <$ symbol "jsr" <*> operand o
+    , NonBasic <$> sym o JSR "jsr" <*> operand o
     ]
 
 
@@ -133,7 +134,11 @@ int = fromIntegral <$> choice
     , decimal
     ]
 
-sym o i tok = try $ i <$ string tok <* notFollowedBy labelChars <* spaces
+sym o i tok = try $ i <$ token <* notFollowedBy labelChars <* spaces 
+  where
+    token = case allowUppercase . options $ o of
+        True -> string tok <|> string (map toUpper tok)
+        False -> string tok
 
 register o = try $ choice
     [ sym o A "a", sym o B "b", sym o C "c"
