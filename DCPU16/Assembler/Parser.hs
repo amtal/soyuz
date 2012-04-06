@@ -18,8 +18,6 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as B
 import Data.Vector (Vector)
 import qualified Data.Vector as V
-import Control.Monad (guard)
-import Data.Generics.Uniplate.Data
 
 
 -- | Parsing options.
