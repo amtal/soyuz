@@ -19,10 +19,12 @@ import Data.Char (toLower)
 import Data.ByteString.Char8 (unpack)
 import Text.Printf
 import Data.Word (Word16)
+import Data.Vector (Vector)
+import qualified Data.Vector as V
 
 -- | Nicely formatted ASCII output.
-pprint :: [Instruction] -> String
-pprint = render . foldl pI empty
+pprint :: Vector Instruction -> String
+pprint = render . V.foldl pI empty
 
 pI :: Doc -> Instruction -> Doc
 pI acc (Comment solo xs) 

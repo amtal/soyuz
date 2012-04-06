@@ -16,11 +16,13 @@ import Control.Applicative hiding (Const)
 import DCPU16.Instructions
 import qualified Data.ByteString.Char8 as B
 import Debug.Trace
+import Data.Vector (Vector)
+import qualified Data.Vector as V
 
 parseFile = parseFromFile asm
 
-asm :: Parser String [Instruction]
-asm = spaces >> instructs <* end where
+asm :: Parser String (Vector Instruction)
+asm = V.fromList `fmap` (spaces >> instructs <* end) where
     instructs = many . lexeme . choice $ [instruction, label, comment, dat]
     end = (eof <?> "comment, end of file, or valid instruction")
 
