@@ -21,7 +21,11 @@ import Data.Vector (Vector)
 import qualified Data.Vector as V
 import Data.Char (toUpper)
 
--- | Parsing options.
+-- | Default parsing options.
+defaults :: Options
+defaults = Options False
+
+-- | Parsing options, if you want to override the defaults.
 data Options = Options
     { allowUppercase :: Bool 
     -- ^ Parse upper case symbols. Default: off.
@@ -30,8 +34,6 @@ data Options = Options
     -- look pretty in small amounts, but holding down the shift key gets old.
     } deriving (Read,Show,Eq)
 
--- | Default options: lower case only.
-defaults = Options False
 
 -- | Parser state. 
 --
