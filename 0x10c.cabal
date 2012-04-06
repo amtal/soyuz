@@ -21,7 +21,6 @@ license-file: LICENSE
 extra-source-files:
     NOTES
 
-main-is: Main.hs
 
 flag split-base
 
@@ -33,4 +32,4 @@ library
         DCPU16.Instructions
         DCPU16.Instructions.Size
         DCPU16.Instructions.Time
-  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate, cereal, bytestring, trifecta, pretty, containers, cmdargs
+  build-depends:	base >= 4 && < 5, vector, QuickCheck, uniplate, cereal, bytestring, trifecta, pretty, containers
