@@ -2,10 +2,32 @@
 import System.Console.CmdArgs
 import System.Exit
 import System.IO (hPutStrLn, stderr)
+import qualified DCPU16.Assembly.Parser as P
+import DCPU16.Assembly.Printer
+import DCPU16.Assembly.Optimizer
 
 main = do
     opts <- cmdArgs options
-    putStrLn "ok."
+    -- read input
+    Just instr <- case runMode opts of
+        Disassemble -> undefined
+        _ -> do
+            let po = P.defaults
+                    { P.allowUppercase = parseUpperCase opts
+                    , P.roundedBrackets = parseSmoothBrackets opts
+                    }
+            P.parseFile po (inputFile opts)
+    -- optimize
+    let instr' = case noOptimization opts of
+            True -> instr
+            False -> sizeVariant instr
+    -- print output
+    let out = case runMode opts of
+            Assemble -> undefined
+            _ -> pprint instr'
+    case output opts of
+        "" -> putStrLn out 
+        f -> writeFile f out
 
 -- | Print a message to stderr and exit.
 errorExit :: String -> IO ()
@@ -18,22 +40,22 @@ data Options = Options
     { runMode :: RunMode
     , inputFile :: String
     , noOptimization :: Bool
-    , outputFile :: String
+    , output :: String
     , parseUpperCase, parseSmoothBrackets :: Bool
     } deriving (Eq,Show,Read,Data,Typeable)
 
 options = Options 
     { runMode = enum
-        [ Assemble   &= help "Assembly -> machine code"
+        [ PrettyPrint&= help "Assembly -> consistently formatted assembly"
+        , Assemble   &= help "Assembly -> machine code"
         , Disassemble&= help "Machine code -> assembly"
-        , PrettyPrint&= help "Assembly -> consistently formatted assembly"
         ] &= groupname "Mode of operation"
-    , inputFile = def &= argPos 0 &= typ "<FILE>"
+    , inputFile = "" &= argPos 0 &= typ "<FILE>"
     , noOptimization = False
         &= explicit &= name "no-optimize"
         &= help "Disable short literal optimization"
         &= groupname "Optimization"
-    , outputFile = def &= explicit &= name "output" &= typ "<FILE>"
+    , output = def &= typ "<FILE>"
         &= help "Write to file instead of stdout"
         &= groupname "General"
     , parseUpperCase = False
