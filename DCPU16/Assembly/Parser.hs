@@ -9,6 +9,8 @@
 -- figure.
 module DCPU16.Assembly.Parser
     ( parseFile
+    , Options(..)
+    , defaults
     ) where
 import Text.Trifecta hiding (Pop,Push)
 import Control.Applicative hiding (Const)
@@ -18,15 +20,31 @@ import qualified Data.ByteString.Char8 as B
 import Data.Vector (Vector)
 import qualified Data.Vector as V
 
-
 -- | Parsing options.
-data Opt = Opt
-    { optSymbols :: (Vector ByteString)
+data Options = Options
+    { allowUppercase :: Bool 
+    -- ^ Parse upper case symbols. Default: off.
+    --
+    -- Large amounts of assembly get written in lower case. Upper case might
+    -- look pretty in small amounts, but holding down the shift key gets old.
     } deriving (Read,Show,Eq)
 
-parseFile f = do
+-- | Default options: lower case only.
+defaults = Options False
+
+-- | Parser state. 
+--
+-- Should factor this into a RWS monad wrapper, but don't understand Trifecta
+-- well enough to do so. Monads, how do they work?
+data Opt = Opt
+    { optSymbols :: (Vector ByteString)
+    , options :: Options
+    } deriving (Read,Show,Eq)
+
+
+parseFile opt f = do
     (Just syms) <- parseFromFile symbolDefs f
-    parseFromFile (asm (Opt syms)) f
+    parseFromFile (asm (Opt syms opt)) f
 
 
 symbolDefs :: Parser String (Vector ByteString)
@@ -76,22 +94,22 @@ comment = do
 
 instruction :: Opt -> Parser String Instruction
 instruction o = choice
-    [ Basic <$> basicOp <*> operand o <* comma <*> operand o
+    [ Basic <$> basicOp o <*> operand o <* comma <*> operand o
     , NonBasic JSR <$ symbol "jsr" <*> operand o
     ]
 
 
 operand :: Opt -> Parser String Operand
 operand o = choice
-    [ sym Pop "pop"
-    , sym Peek "peek"
-    , sym Push "push"
-    , sym SP "sp"
-    , sym PC "pc"
-    , sym O "o"
-    , Direct <$> register
-    , try $ Indirect <$> brackets register
-    , try $ brackets (Offset <$> word o <* symbol "+" <*> register)
+    [ sym o Pop "pop"
+    , sym o Peek "peek"
+    , sym o Push "push"
+    , sym o SP "sp"
+    , sym o PC "pc"
+    , sym o O "o"
+    , Direct <$> register o
+    , try $ Indirect <$> brackets (register o)
+    , try $ brackets (Offset <$> word o <* symbol "+" <*> register o)
     , DirectLiteral <$> word o
     , IndirectLiteral <$> brackets (word o)
     ]
@@ -115,18 +133,18 @@ int = fromIntegral <$> choice
     , decimal
     ]
 
-sym i tok = try $ i <$ string tok <* notFollowedBy labelChars <* spaces
+sym o i tok = try $ i <$ string tok <* notFollowedBy labelChars <* spaces
 
-register = try $ choice
-    [ sym A "a", sym B "b", sym C "c"
-    , sym X "x", sym Y "y", sym Z "z"
-    , sym I "i", sym J "j"
+register o = try $ choice
+    [ sym o A "a", sym o B "b", sym o C "c"
+    , sym o X "x", sym o Y "y", sym o Z "z"
+    , sym o I "i", sym o J "j"
     ] 
 
-basicOp = choice
-    [ sym SET "set", sym ADD "add", sym SUB "sub"
-    , sym MUL "mul", sym DIV "div", sym MOD "mod", sym SHL "shl"
-    , sym SHR "shr", sym AND "and", sym BOR "bor", sym XOR "xor"
-    , sym IFE "ife", sym IFN "ifn", sym IFG "ifg", sym IFB "ifb"
+basicOp o = choice
+    [ sym o SET "set", sym o ADD "add", sym o SUB "sub"
+    , sym o MUL "mul", sym o DIV "div", sym o MOD "mod", sym o SHL "shl"
+    , sym o SHR "shr", sym o AND "and", sym o BOR "bor", sym o XOR "xor"
+    , sym o IFE "ife", sym o IFN "ifn", sym o IFG "ifg", sym o IFB "ifb"
     ]
 
