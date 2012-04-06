@@ -23,7 +23,7 @@ import Data.Char (toUpper)
 
 -- | Default parsing options.
 defaults :: Options
-defaults = Options False
+defaults = Options False False
 
 -- | Parsing options, if you want to override the defaults.
 data Options = Options
@@ -32,6 +32,10 @@ data Options = Options
     --
     -- Large amounts of assembly get written in lower case. Upper case might
     -- look pretty in small amounts, but holding down the shift key gets old.
+    , roundedBrackets :: Bool
+    -- ^ Indirect mode via \(\) instead of \[\]. Default: off.
+    --
+    -- Weird, but showed up in a screenshot.
     } deriving (Read,Show,Eq)
 
 
@@ -45,6 +49,10 @@ data Opt = Opt
     } deriving (Read,Show,Eq)
 
 
+-- | Parse a file.
+--
+-- Detailed  errors with line and column numbers (as well as expected values)
+-- will be printed to console if parsing fails.
 parseFile opt f = do
     (Just syms) <- parseFromFile symbolDefs f
     parseFromFile (asm (Opt syms opt)) f
@@ -111,12 +119,18 @@ operand o = choice
     , sym o PC "pc"
     , sym o O "o"
     , Direct <$> register o
-    , try $ Indirect <$> brackets (register o)
-    , try $ brackets (Offset <$> word o <* symbol "+" <*> register o)
+    , try $ Indirect <$> brace o (register o)
+    , try $ brace o (Offset <$> word o <* symbol "+" <*> register o)
     , DirectLiteral <$> word o
-    , IndirectLiteral <$> brackets (word o)
+    , IndirectLiteral <$> brace o (word o)
     ]
-    
+
+-- This code is based on the Haskell parser, and thus strips a lot more
+-- whitespace than desired. [\na+2] probably shouldn't be valid assembly.
+brace o = case roundedBrackets $ options o of
+    True -> nesting . between (symbolic '(') (symbolic ')')
+    False -> brackets
+ 
 word :: Opt -> Parser String Word
 word o = lexeme $ choice
     [ Const <$> int
