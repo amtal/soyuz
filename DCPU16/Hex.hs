@@ -40,13 +40,23 @@ dump = concat . V.toList . V.imap pAddr
 -- If faced with odd number of bytes, truncates the last one and prints a
 -- warning to stderr.
 dumpBytes :: ByteString -> String
-dumpBytes s = dump . V.fromList . getWords $ s where
+dumpBytes s = dump . getWord16s $ s where
     len = B.length s
     s' = case len `mod` 2 of
             1 -> warn msg $ B.init s
             0 -> s
     msg = "Warning: truncating last byte of "++show len++" byte hex string before\n"
        ++ "         dumping. Dump works on 16-bit words only."
-    getWords = either err id . runGet (getListOf getWord16be) where
-        err e = error $ "Couldn't parse 16 bit words from even-length bytestring: "++e
 
+-- | Utility for parsing bytestrings as word lists.
+--
+-- If length in bytes is odd, discards last byte silently.
+getWord16s :: ByteString -> Vector Word16
+getWord16s s = V.fromList . reverse . either err id $ runGet (f len []) s
+  where
+    len = B.length s `div` 2
+    f 0 acc = return acc
+    f n acc = do
+        w <- getWord16be
+        f (n-1) (w:acc)
+    err e = error $ "getWord16s impossible error: "++e
