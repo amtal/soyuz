@@ -9,6 +9,7 @@ import DCPU16.Assembly.Printer
 import DCPU16.Assembly.Optimizer
 import DCPU16.Assembler
 import DCPU16.Disassembler
+import DCPU16.Hex
 
 main = do
     opts <- cmdArgs options
@@ -28,9 +29,9 @@ main = do
             True -> instr
             False -> sizeVariant instr
     -- print output
-    let out = case runMode opts of
-            Assemble -> do
-                B.unpack . assemble $ instr'
+    let binEncoding = if hexdump opts then dumpBytes else B.unpack
+        out = case runMode opts of
+            Assemble -> binEncoding . assemble $ instr'
             _ -> pprint instr'
     case output opts of
         "" -> putStrLn out 
@@ -48,6 +49,7 @@ data Options = Options
     , inputFile :: String
     , noOptimization :: Bool
     , output :: String
+    , hexdump :: Bool
     , parseUpperCase, parseSmoothBrackets :: Bool
     } deriving (Eq,Show,Read,Data,Typeable)
 
@@ -65,6 +67,7 @@ options = Options
     , output = def &= typ "<FILE>"
         &= help "Write to file instead of stdout"
         &= groupname "General"
+    , hexdump = False &= help "Encode binary data in a 16-bit hexdump"
     , parseUpperCase = False
         &= explicit &= name "uppercase"
         &= help "Parse uppercase symbols (but never mixed case)"
