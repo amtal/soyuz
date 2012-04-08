@@ -55,6 +55,9 @@ amtal@yggdrasil:~/code/0x10c$ ./0x10c -p fib.asm --uppercase
 ; this program takes 
                 set pc, loop
 amtal@yggdrasil:~/code/0x10c$ 
+amtal@yggdrasil:~/code/0x10c$ ./0x10c -a fib.asm -h --upper
+0000: 8401 8411 8591 0402 01a1 0401 6411 a9be
+0008: 8dc1
 
 ```
 
