@@ -24,6 +24,7 @@ Optimization:
      --no-optimize      Disable short literal optimization
 General:
   -o --output=<FILE>    Write to file instead of stdout
+  -h --hexdump          Encode binary data in a 16-bit hexdump
      --uppercase        Parse uppercase symbols (but never mixed case)
      --smooth-brackets  Parse (a) instead of [a] for indirect mode
   -? --help             Display help message
