@@ -1,14 +1,16 @@
-Haskell library for writing assemblers/compilers/disassemblers for the DCPU-16 architecture.
+Advanced utility library for the DCPU-16 architecture.
 
-An instruction set data type forms the core. Around it, utilities are built:
+Provides a core instruction set data type, with utilities built around it.
 
-* assembly parser with nice error messages, and ability to handle inconsistent implementations
-* consistent pretty-printer, for smoothing out inconsistent styles and implementations
-* machine code encoding/decoding
-* simple optimizer (so far, only optimizes short literals, although it works on labels too)
-* stuff for writing interpreters/debuggers
+Libraries
+---------
 
-Most of these are accessible via a command line tool:
+Semi-recent docs at http://amtal.github.com/0x10c
+
+Command Line Tool
+-----------------
+
+Output of --help:
 
 ```
 amtal@yggdrasil:~/code/0x10c$ ./0x10c --help
@@ -31,6 +33,11 @@ General:
   -V --version          Print version information
 
 Documentation and source at https://github.com/amtal/0x10c or on Hackage.
+```
+
+Usage demonstration:
+
+```
 amtal@yggdrasil:~/code/0x10c$ cat > fib.asm
 ; Fibonacci filler from reddit
 SET A, 1
@@ -55,19 +62,17 @@ amtal@yggdrasil:~/code/0x10c$ ./0x10c -p fib.asm --uppercase
                 ifg sp, 0xa             ; 10 because that's how much space 
 ; this program takes 
                 set pc, loop
-amtal@yggdrasil:~/code/0x10c$ 
 amtal@yggdrasil:~/code/0x10c$ ./0x10c -a fib.asm -h --upper
 0000: 8401 8411 8591 0402 01a1 0401 6411 a9be
 0008: 8dc1
-
 ```
 
 More advanced tools can be written using the libraries.
 
-Library Examples
-----------------
+Parser Error Messages
+---------------------
 
-Trifecta parse error messages, with colour:
+No really, they're quite nice. They're even coloured!*
 
 ```
 *DCPU16.Assembler.Parser> parseFile "test.masm"
@@ -85,3 +90,5 @@ lower.masm:14:29: error: label "lop" not defined
 Nothing
 *DCPU16.Assembler.Parser> 
 ```
+
+* No colour visible in copy-pastes.
