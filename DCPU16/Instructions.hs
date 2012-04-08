@@ -91,15 +91,15 @@ instance Serialize Instruction where
         let (a',aw) = packOp a
             (b',bw) = packOp b
         putWord16be $ (((b' `shiftL` 6) .|. a') `shiftL` 4) .|. fromOpCode op
-        maybe (return ()) putWord16be aw
-        maybe (return ()) putWord16be bw
+        maybe (return ()) put aw
+        maybe (return ()) put bw
     put (NonBasic op a) = putNonBasic opCode a
       where
         opCode = case op of JSR->0x01; Reserved x->0x3f.&.x
         putNonBasic op a = do 
             let (a',w) = packOp a
             putWord16be $ shiftL ((shiftL a' 6) .|. op) 4
-            maybe (return ()) putWord16be w
+            maybe (return ()) put w
     put (Data x) = put x
     put (Label s) = return ()
     get = do
@@ -128,8 +128,17 @@ getOp op | op<=0x0f = getRegMode op
          | otherwise = return $ toOperand op
 
 -- | Pack 6-bit operand and any additional word it has.
-packOp :: Operand -> (Word16, Maybe Word16)
-packOp = undefined
+packOp :: Operand -> (Word16, Maybe Word)
+packOp (Direct r)           = (regId r, Nothing)
+packOp (Indirect r)         = (0x08+regId r, Nothing)
+packOp (Offset off r)       = (0x10+regId r, Just off)
+packOp (IndirectLiteral w)  = (0x1e,    Just w)
+packOp (DirectLiteral w)    = (0x1f,    Just w)
+packOp (ShortLiteral (Const w)) = (0x20+w,  Nothing)
+packOp (ShortLiteral (LabelAddr s)) = error $ "can not serialize label address "++show s
+packOp o = (fromOperand o, Nothing)
+
+regId = fromIntegral . fromEnum
 
 getRegMode :: Word16 -> Get Operand
 getRegMode op | op `testBit` 3 = do offset <- get
@@ -139,12 +148,11 @@ getRegMode op | op `testBit` 3 = do offset <- get
   where
     r = toEnum . fromIntegral $ op .&. 0x7
 
-toOperand 0x18 = Pop
-toOperand 0x19 = Peek
-toOperand 0x1a = Push
-toOperand 0x1b = SP
-toOperand 0x1c = PC
-toOperand 0x1d = O
+toOperand 0x18 = Pop; toOperand 0x19 = Peek; toOperand 0x1a = Push
+toOperand 0x1b = SP; toOperand 0x1c = PC; toOperand 0x1d = O
+
+fromOperand Pop = 0x18; fromOperand Peek = 0x19; fromOperand Push = 0x1a
+fromOperand SP = 0x1b; fromOperand PC = 0x1c; fromOperand O = 0x1d 
 
 fromOpCode SET=0x1; fromOpCode ADD=0x2; fromOpCode SUB=0x3
 fromOpCode MUL=0x4; fromOpCode DIV=0x5; fromOpCode MOD=0x6; fromOpCode SHL=0x7
