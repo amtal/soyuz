@@ -74,8 +74,8 @@ options = Options
     , parseSmoothBrackets = False
         &= explicit &= name "smooth-brackets"
         &= help "Parse (a) instead of [a] for indirect mode"
-    } &= program "0x10c"
-      &= summary "0x10c 0.0.0, amtal <alex.kropivny@gmail.com>"
+    } &= program "soyuz"
+      &= summary "soyuz 0.0.0, amtal <alex.kropivny@gmail.com>"
       &= details
-    [ "Documentation and source at https://github.com/amtal/0x10c or on Hackage."
+    [ "Documentation and source at https://github.com/amtal/soyuz or on Hackage."
     ]

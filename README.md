@@ -5,7 +5,7 @@ Provides a core instruction set data type, with utilities built around it.
 Libraries
 ---------
 
-Semi-recent docs at http://amtal.github.com/0x10c
+Semi-recent docs at http://amtal.github.com/soyuz
 
 Command Line Tool
 -----------------
@@ -13,10 +13,10 @@ Command Line Tool
 Output of --help:
 
 ```
-amtal@yggdrasil:~/code/0x10c$ ./0x10c --help
-0x10c 0.0.0, amtal <alex.kropivny@gmail.com>
+$ soyuz --help
+soyuz 0.0.0, amtal <alex.kropivny@gmail.com>
 
-0x10c [OPTIONS] <FILE>
+soyuz [OPTIONS] <FILE>
 
 Mode of operation:
   -p --prettyprint      Assembly -> consistently formatted assembly
@@ -32,13 +32,13 @@ General:
   -? --help             Display help message
   -V --version          Print version information
 
-Documentation and source at https://github.com/amtal/0x10c or on Hackage.
+Documentation and source at https://github.com/amtal/soyuz or on Hackage.
 ```
 
 Usage demonstration:
 
 ```
-amtal@yggdrasil:~/code/0x10c$ cat > fib.asm
+$ cat > fib.asm
 ; Fibonacci filler from reddit
 SET A, 1
 SET B, 1
@@ -50,7 +50,7 @@ SET B, PEEK
 IFG SP, 10 ; 10 because that's how much space 
 ; this program takes 
 SET PC, loop
-amtal@yggdrasil:~/code/0x10c$ ./0x10c -p fib.asm --uppercase
+$ soyuz -p fib.asm --uppercase
 ; Fibonacci filler from reddit
                 set a, 0x1
                 set b, 0x1
@@ -62,7 +62,7 @@ amtal@yggdrasil:~/code/0x10c$ ./0x10c -p fib.asm --uppercase
                 ifg sp, 0xa             ; 10 because that's how much space 
 ; this program takes 
                 set pc, loop
-amtal@yggdrasil:~/code/0x10c$ ./0x10c -a fib.asm -h --upper
+$ soyuz -a fib.asm -h --upper
 0000: 8401 8411 8591 0402 01a1 0401 6411 a9be
 0008: 8dc1
 ```
