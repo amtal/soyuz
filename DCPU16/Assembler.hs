@@ -1,7 +1,18 @@
 -- | Assembler.
+--
+-- Works with "DCPU16.Instructions". Does no optimizations, just converts
+-- labels to direct addresses and produces machine code.
+--
+-- Needs to be extended to support relative addressing. Extending labels to do
+-- arithmetic: @sub pc,this-loop@ is a necessary step. I see this as more of an
+-- optimization problem, since these kinds of rewrites would be neat to perform
+-- automatically...
+--
+-- We'll see which direction it gets approached from.
 module DCPU16.Assembler 
-    ( labelAddrs
-    , assemble
+    ( assemble
+    -- * Utility
+    , labelAddrs
     ) where
 import DCPU16.Instructions
 import DCPU16.Instructions.Size
@@ -15,11 +26,12 @@ import qualified Data.Map as M
 import Data.Map (Map)
 import Data.Serialize
 
+-- | Turn labels into direct addresses, and output machine code.
 assemble :: Vector Instruction -> ByteString
 assemble = B.concat . V.toList . V.map (runPut . put) . labelsToAddrs
 
 
--- | Determine addresses of all label definitions.
+-- | Build address lookup table for label definitions.
 labelAddrs :: Vector Instruction -> Map ByteString Word16
 labelAddrs = snd . V.foldl f (0,M.empty) where
     f (addr,map) i = (addr',map') where

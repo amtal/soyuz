@@ -9,8 +9,8 @@
 -- figure.
 module DCPU16.Assembly.Parser
     ( parseFile
-    , Options(..)
     , defaults
+    , Options(..)
     ) where
 import Text.Trifecta hiding (Pop,Push)
 import Control.Applicative hiding (Const)

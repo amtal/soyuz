@@ -1,3 +1,9 @@
+-- | Disassembler.
+--
+-- I should really convert these to use Vector Word16, rather than ByteString.
+--
+-- It won't be useful for command line tools, but make more sense for
+-- everything else.
 module DCPU16.Disassembler
     ( disassemble
     ) where

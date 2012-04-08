@@ -1,5 +1,11 @@
-module DCPU16.Hex
-    ( dump, dumpBytes
+-- | A weird utility module, with stuff I don't know where to put.
+--
+-- I didn't call it Util because that's just a slippery slope.
+module DCPU16.Hex ( 
+    -- * Hexdumps
+      dump, dumpBytes
+    -- * Homeless utility functions
+    , warn, getWord16s
     ) where
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
@@ -21,6 +27,12 @@ warn s a = unsafePerformIO (hPutStrLn stderr s >> return a)
 
 
 -- | Prints a nice dump of 16-bit words.
+--
+-- >>> putStrLn . dump . fromList $ [1..32]
+-- 0000: 0001 0002 0003 0004 0005 0006 0007 0008
+-- 0008: 0009 000a 000b 000c 000d 000e 000f 0010
+-- 0010: 0011 0012 0013 0014 0015 0016 0017 0018
+-- 0018: 0019 001a 001b 001c 001d 001e 001f 0020
 --
 -- Complexity is probably terrible, but when people write programs big enough
 -- for it to matter, I'll fix it.
@@ -49,6 +61,9 @@ dumpBytes s = dump . getWord16s $ s where
        ++ "         dumping. Dump works on 16-bit words only."
 
 -- | Utility for parsing bytestrings as word lists.
+--
+-- >>> getWord16s . pack $ "asdfasdf"
+-- fromList [24947,25702,24947,25702]
 --
 -- If length in bytes is odd, discards last byte silently.
 getWord16s :: ByteString -> Vector Word16

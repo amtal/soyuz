@@ -6,7 +6,14 @@
 -- Contains a trivial 'Label' extension, which isn't present in machine code
 -- but is useful for dealing with assembly.
 module DCPU16.Instructions
-    ( Instruction(..), BasicOp(..), NonBasicOp(..), Operand(..), Register(..), Word(..)
+    ( Instruction(..)
+    -- * Operands
+    , Operand(..)
+    , Register(..)
+    , Word(..)
+    -- * Operations
+    , BasicOp(..)
+    , NonBasicOp(..)
     ) where
 -- Fundamental types
 import Data.Word hiding (Word)
