@@ -1,11 +1,10 @@
-module DCPU16.Assembly.Disassembler
-    (
+module DCPU16.Disassembler
+    ( disassemble
     ) where
 import DCPU16.Instructions
 import Data.ByteString (ByteString)
 import qualified Data.Vector as V
 import Data.Vector (Vector)
-import Data.Serialize.Get
 import Data.Serialize
 
 disassemble :: ByteString -> Vector Instruction
