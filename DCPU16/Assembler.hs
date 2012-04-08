@@ -45,3 +45,4 @@ labelsToAddrs is =
         f (LabelAddr s) = case M.lookup s lut of
             Just addr -> Const addr
             Nothing -> error $ "Undefined label: "++show s
+        f x = x
