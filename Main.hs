@@ -3,14 +3,20 @@ import System.Console.CmdArgs
 import System.Exit
 import System.IO (hPutStrLn, stderr)
 import qualified DCPU16.Assembly.Parser as P
+import Data.ByteString (ByteString)
+import qualified Data.ByteString.Char8 as B
 import DCPU16.Assembly.Printer
 import DCPU16.Assembly.Optimizer
+import DCPU16.Assembler
+import DCPU16.Disassembler
 
 main = do
     opts <- cmdArgs options
     -- read input
     Just instr <- case runMode opts of
-        Disassemble -> undefined
+        Disassemble -> do
+            s <- B.readFile (inputFile opts)
+            return . Just . disassemble $ s
         _ -> do
             let po = P.defaults
                     { P.allowUppercase = parseUpperCase opts
@@ -23,7 +29,8 @@ main = do
             False -> sizeVariant instr
     -- print output
     let out = case runMode opts of
-            Assemble -> undefined
+            Assemble -> do
+                B.unpack . assemble $ instr'
             _ -> pprint instr'
     case output opts of
         "" -> putStrLn out 
