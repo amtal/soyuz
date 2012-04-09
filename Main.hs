@@ -5,6 +5,7 @@ import System.IO (hPutStrLn, stderr)
 import qualified DCPU16.Assembly.Parser as P
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as B
+import Control.Monad (when, void)
 import DCPU16.Assembly.Printer
 import DCPU16.Assembly.Optimizer
 import DCPU16.Assembler
@@ -13,30 +14,34 @@ import DCPU16.Hex
 
 main = do
     opts <- cmdArgs options
-    -- read input
-    Just instr <- case runMode opts of
-        Disassemble -> do
-            s <- B.readFile (inputFile opts)
-            return . Just . disassemble $ s
-        _ -> do
-            let po = P.defaults
-                    { P.allowUppercase = parseUpperCase opts
-                    , P.roundedBrackets = parseSmoothBrackets opts
-                    }
-            P.parseFile po (inputFile opts)
-    -- optimize
-    let instr' = if noOptimization opts then instr else sizeVariant instr
-    -- print output
-    let binEncoding = if hexdump opts then packNlEof . dumpBytes else id
-        out = case runMode opts of
-            Assemble -> binEncoding . assemble $ instr'
-            _ -> packNlEof $ pprint instr'
+    instr <- readInput opts
+    let out = processOutput opts . optimize opts $ instr
     case output opts of
         -- absolutely do not do 'putStrLn', to not break binary input:
         "" -> B.putStr out 
         f -> B.writeFile f out
   where
     packNlEof s = B.snoc (B.pack s) '\n'
+    readInput opts = do
+        instr <- case runMode opts of
+            Disassemble -> do
+                s <- B.readFile (inputFile opts)
+                return . Just . disassemble $ s
+            _ -> do
+                let po = P.defaults
+                        { P.allowUppercase = parseUpperCase opts
+                        , P.roundedBrackets = parseSmoothBrackets opts
+                        }
+                P.parseFile po (inputFile opts)
+        case instr of
+            Just is -> return is
+            Nothing -> exitFailure -- parser already printed messages
+    optimize opts is = if noOptimization opts then is else sizeVariant is
+    processOutput opts instr = case runMode opts of
+        Assemble -> binEncoding . assemble $ instr
+        _ -> packNlEof $ pprint instr
+      where
+        binEncoding = if hexdump opts then packNlEof . dumpBytes else id
 
 -- | Print a message to stderr and exit.
 errorExit :: String -> IO ()
