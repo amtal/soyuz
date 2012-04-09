@@ -68,7 +68,7 @@ options = Options
     , inputFile = "" &= argPos 0 &= typ "<FILE>"
     , noOptimization = False
         &= explicit &= name "no-optimize"
-        &= help "Disable short literal optimization"
+        &= help "Disable short literal/label optimization"
         &= groupname "Optimization"
     , output = def &= typ "<FILE>"
         &= help "Write to file instead of stdout"

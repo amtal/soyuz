@@ -25,7 +25,7 @@ Mode of operation:
   -a --assemble         Assembly -> machine code
   -d --disassemble      Machine code -> assembly
 Optimization:
-     --no-optimize      Disable short literal optimization
+     --no-optimize      Disable short literal/label optimization
 General:
   -o --output=<FILE>    Write to file instead of stdout
   -h --hexdump          Encode binary data in a 16-bit hexdump
