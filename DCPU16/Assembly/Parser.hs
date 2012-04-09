@@ -157,10 +157,10 @@ int = fromInteger <$> (num >>= checkSize)
     checkSize :: Integer -> Parser String Integer
     checkSize n = if n>0xffff 
         then do
-            warn [] (printf fmt n)
+            err [] (printf fmt n)
             return (mod n 0xffff)
         else return n
-    fmt = "literal 0x%x wider than 16 bits, truncating to fit"
+    fmt = "literal 0x%x is wider than 16 bits"
 
 
 sym o i tok = try $ i <$ token <* notFollowedBy labelChars <* spaces 
