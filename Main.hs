@@ -27,13 +27,16 @@ main = do
     -- optimize
     let instr' = if noOptimization opts then instr else sizeVariant instr
     -- print output
-    let binEncoding = if hexdump opts then dumpBytes else B.unpack
+    let binEncoding = if hexdump opts then packNlEof . dumpBytes else id
         out = case runMode opts of
             Assemble -> binEncoding . assemble $ instr'
-            _ -> pprint instr'
+            _ -> packNlEof $ pprint instr'
     case output opts of
-        "" -> putStrLn out 
-        f -> writeFile f out
+        -- absolutely do not do 'putStrLn', to not break binary input:
+        "" -> B.putStr out 
+        f -> B.writeFile f out
+  where
+    packNlEof s = B.snoc (B.pack s) '\n'
 
 -- | Print a message to stderr and exit.
 errorExit :: String -> IO ()
