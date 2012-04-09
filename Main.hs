@@ -70,7 +70,7 @@ options = Options
     , hexdump = False &= help "Encode binary data in a 16-bit hexdump"
     , parseUpperCase = False
         &= explicit &= name "uppercase"
-        &= help "Parse uppercase symbols (but never mixed case)"
+        &= help "Parse mixed in uppercase symbols"
     , parseSmoothBrackets = False
         &= explicit &= name "smooth-brackets"
         &= help "Parse (a) instead of [a] for indirect mode"

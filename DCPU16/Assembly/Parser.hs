@@ -28,7 +28,7 @@ defaults = Options False False
 -- | Parsing options, if you want to override the defaults.
 data Options = Options
     { allowUppercase :: Bool 
-    -- ^ Parse upper case symbols. Default: off.
+    -- ^ Parse upper case symbols as well as lower. Default: off.
     --
     -- Large amounts of assembly get written in lower case. Upper case might
     -- look pretty in small amounts, but holding down the shift key gets old.
