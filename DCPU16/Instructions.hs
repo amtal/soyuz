@@ -110,11 +110,13 @@ instance Serialize Instruction where
     put (Label s) = return ()
     get = do
         w <- getWord16be
-        let [b,a,op] = fmap (w.&.) [0xfc00, 0x03f0, 0x000f]
+        let [b,a,op] = fmap (maskShr w) [(0xfc00,10), (0x03f0,4), (0x000f,0)]
         if op==0 then
             NonBasic (getNBCode a) <$> getOp b
                 else
             Basic (toOpCode op) <$> getOp a <*> getOp b
+      where
+        maskShr w (mask,sh) = shiftR (w.&.mask) sh
 
 
 instance Serialize Word where
