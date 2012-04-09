@@ -22,6 +22,7 @@ import Data.Word (Word16)
 import qualified Data.Vector as V
 import Data.Char (toUpper)
 import Control.Monad (void,unless)
+import Text.Printf
 
 -- | Default parsing options.
 defaults :: Options
@@ -155,11 +156,11 @@ int = fromInteger <$> (num >>= checkSize)
         ]
     checkSize :: Integer -> Parser String Integer
     checkSize n = if n>0xffff 
-        then return n
-        else do
-            warn [] msg
+        then do
+            warn [] (printf fmt n)
             return (mod n 0xffff)
-    msg = "literal wider than 16 bits, truncating to fit"
+        else return n
+    fmt = "literal 0x%x wider than 16 bits, truncating to fit"
 
 
 sym o i tok = try $ i <$ token <* notFollowedBy labelChars <* spaces 
