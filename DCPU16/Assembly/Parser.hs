@@ -18,6 +18,7 @@ import DCPU16.Instructions
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as B
 import Data.Vector (Vector)
+import Data.Word (Word16)
 import qualified Data.Vector as V
 import Data.Char (toUpper)
 
@@ -145,10 +146,21 @@ word o = lexeme $ choice
         return $ LabelAddr s
 
 
-int = fromIntegral <$> choice
-    [ try $ (char '0' <?> "\"0x\"") >> hexadecimal
-    , decimal
-    ]
+int :: Parser String Word16
+int = fromInteger <$> (num >>= checkSize)
+  where
+    num = choice
+        [ try $ (char '0' <?> "\"0x\"") >> hexadecimal
+        , decimal
+        ]
+    checkSize :: Integer -> Parser String Integer
+    checkSize n = case n>0xffff of
+        False -> return n
+        True -> do
+            warn [] $ msg
+            return (mod n 0xffff)
+    msg = "literal wider than 16 bits, truncating to fit"
+
 
 sym o i tok = try $ i <$ token <* notFollowedBy labelChars <* spaces 
   where
