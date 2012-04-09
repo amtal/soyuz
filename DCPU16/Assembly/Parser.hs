@@ -117,11 +117,17 @@ operand o = choice
     , sym o PC "pc"
     , sym o O "o"
     , Direct <$> register o
-    , try $ Indirect <$> brace o (register o)
-    , try $ brace o (Offset <$> word o <* symbol "+" <*> register o)
     , DirectLiteral <$> word o
-    , IndirectLiteral <$> brace o (word o)
+    , brace o (indirect o)
     ]
+  where
+    indirect o = choice
+        [ try $ Offset <$> word o <* symbol "+" <*> register o
+        , try $ flip Offset <$> register o <* symbol "+" <*> word o
+        , try $ Indirect <$> register o
+        , IndirectLiteral <$> word o
+        ]
+
 
 -- This code is based on the Haskell parser, and thus strips a lot more
 -- whitespace than desired. [\na+2] probably shouldn't be valid assembly.
