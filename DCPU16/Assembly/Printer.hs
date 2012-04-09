@@ -35,7 +35,8 @@ pI acc (Data x)  = acc $$ nest 16 (text "dat" <+> pW x)
 pI acc (Basic op a b) = acc $$ nest 16 (pBO op <+> pO a <> comma <+> pO b)
 pI acc (NonBasic op a)= acc $$ nest 16 (pNBO op <+> pO a)
 
-pW (Const x) = pHex "0x%x" x
+pW (Const x) | x<0xa     = text . show $ x
+             | otherwise = pHex "0x%x" x
 pW (LabelAddr s) = text . unpack $ s
 
 pBO :: BasicOp -> Doc
