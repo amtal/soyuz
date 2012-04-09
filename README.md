@@ -1,11 +1,13 @@
 Advanced utility library for the DCPU-16 architecture.
 
-Provides a core instruction set data type, with utilities built around it.
+Core Goals
+----------
 
-Libraries
----------
+* All outputs will be compatible with official tools, and follow any official specs.
+* Within that, go crazy with optimizations and features.
+* Provide both command line tools, and developer libraries.
 
-Semi-recent docs at http://amtal.github.com/soyuz
+Semi-recent library docs are at http://amtal.github.com/soyuz.
 
 Command Line Tool
 -----------------
