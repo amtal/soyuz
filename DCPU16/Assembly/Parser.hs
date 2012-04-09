@@ -94,7 +94,7 @@ label = Label <$ char ':' <*> labelName <* spaces
 
 labelName = B.pack `fmap` some labelChars
 
-labelChars = alphaNum 
+labelChars = alphaNum <|> char '_'
 
 comment = do
     char ';'
