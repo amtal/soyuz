@@ -127,7 +127,8 @@ getNBCode op = Reserved op
 
 -- | Parse 6-bit operand.
 getOp :: Word16 -> Get Operand
-getOp op | op<=0x0f = getRegMode op
+getOp op | op<=0x17 = getRegMode op
+         -- 0x18-0x1d are simple operands
          | op==0x1e = IndirectLiteral <$> get
          | op==0x1f = DirectLiteral <$> get
          | op>=0x20 = return $ (ShortLiteral . Const) (op-0x20)
@@ -147,9 +148,9 @@ packOp o = (fromOperand o, Nothing)
 regId = fromIntegral . fromEnum
 
 getRegMode :: Word16 -> Get Operand
-getRegMode op | op `testBit` 3 = do offset <- get
-                                    return (Offset offset r)
-              | op `testBit` 4 = return (Indirect r)
+getRegMode op | op .&. 0x10 == 0x10 = return (Indirect r)
+              | op .&. 0x08 == 0x08 = do offset <- get
+                                         return (Offset offset r)
               | otherwise = return (Direct r)
   where
     r = toEnum . fromIntegral $ op .&. 0x7
