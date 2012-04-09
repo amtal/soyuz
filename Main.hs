@@ -29,8 +29,7 @@ main = do
                 return . Just . disassemble $ s
             _ -> do
                 let po = P.defaults
-                        { P.allowUppercase = parseUpperCase opts
-                        , P.roundedBrackets = parseSmoothBrackets opts
+                        { P.roundedBrackets = parseSmoothBrackets opts
                         }
                 P.parseFile po (inputFile opts)
         case instr of
@@ -56,7 +55,7 @@ data Options = Options
     , noOptimization :: Bool
     , output :: String
     , hexdump :: Bool
-    , parseUpperCase, parseSmoothBrackets :: Bool
+    , parseSmoothBrackets :: Bool
     } deriving (Eq,Show,Read,Data,Typeable)
 
 options = Options 
@@ -74,9 +73,6 @@ options = Options
         &= help "Write to file instead of stdout"
         &= groupname "General"
     , hexdump = False &= help "Encode binary data in a 16-bit hexdump"
-    , parseUpperCase = False
-        &= explicit &= name "uppercase"
-        &= help "Parse mixed in uppercase symbols"
     , parseSmoothBrackets = False
         &= explicit &= name "smooth-brackets"
         &= help "Parse (a) instead of [a] for indirect mode"

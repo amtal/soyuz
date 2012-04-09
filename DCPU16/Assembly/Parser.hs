@@ -26,16 +26,11 @@ import Text.Printf
 
 -- | Default parsing options.
 defaults :: Options
-defaults = Options False False
+defaults = Options False
 
 -- | Parsing options, if you want to override the defaults.
 data Options = Options
-    { allowUppercase :: Bool 
-    -- ^ Parse upper case symbols as well as lower. Default: off.
-    --
-    -- Large amounts of assembly get written in lower case. Upper case might
-    -- look pretty in small amounts, but holding down the shift key gets old.
-    , roundedBrackets :: Bool
+    { roundedBrackets :: Bool
     -- ^ Indirect mode via \(\) instead of \[\]. Default: off.
     --
     -- Weird, but showed up in a screenshot.
@@ -165,9 +160,7 @@ int = fromInteger <$> (num >>= checkSize)
 
 sym o i tok = try $ i <$ token <* notFollowedBy labelChars <* spaces 
   where
-    token = if allowUppercase . options $ o
-        then string tok <|> string (map toUpper tok)
-        else string tok
+    token = string tok <|> string (map toUpper tok)
 
 register o = try $ choice
     [ sym o A "a", sym o B "b", sym o C "c"
