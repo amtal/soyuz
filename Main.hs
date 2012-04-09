@@ -25,9 +25,7 @@ main = do
                     }
             P.parseFile po (inputFile opts)
     -- optimize
-    let instr' = case noOptimization opts of
-            True -> instr
-            False -> sizeVariant instr
+    let instr' = if noOptimization opts then instr else sizeVariant instr
     -- print output
     let binEncoding = if hexdump opts then dumpBytes else B.unpack
         out = case runMode opts of

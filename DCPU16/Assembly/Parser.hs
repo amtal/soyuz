@@ -21,6 +21,7 @@ import Data.Vector (Vector)
 import Data.Word (Word16)
 import qualified Data.Vector as V
 import Data.Char (toUpper)
+import Control.Monad (void,unless)
 
 -- | Default parsing options.
 defaults :: Options
@@ -45,7 +46,7 @@ data Options = Options
 -- Should factor this into a RWS monad wrapper, but don't understand Trifecta
 -- well enough to do so. Monads, how do they work?
 data Opt = Opt
-    { optSymbols :: (Vector ByteString)
+    { optSymbols :: Vector ByteString
     , options :: Options
     } deriving (Read,Show,Eq)
 
@@ -68,7 +69,7 @@ symbolDefs = process `fmap` (spaces >> ls <* end) where
     -- labels appear at the start of lines: 
     -- if something un-label-like seen, skip to next line
     ls = many . lexeme . choice $ [label,nextLine]
-    nextLine = (Data (Const 0)) <$ skipSome (satisfy notMark)
+    nextLine = Data (Const 0) <$ skipSome (satisfy notMark)
     notMark c = c/='\n'
     process = V.fromList . map (\(Label s)->s) . filter isLabel
     isLabel (Label _) = True
@@ -83,7 +84,7 @@ asm :: Opt -> Parser String (Vector Instruction)
 asm o = V.fromList `fmap` (spaces >> instructs <* end) where
     instructs = many . lexeme . choice $ [instruction o, label, comment, dat o]
 
-end = (eof <?> "comment, end of file, or valid instruction")
+end = eof <?> "comment, end of file, or valid instruction"
 
 -- | For now, data only handles one word. 
 --
@@ -102,7 +103,7 @@ comment = do
     l <- line
     Comment (B.head l == ';') <$> manyTill anyChar eofOrNewline 
   where
-    eofOrNewline = ((try newline >> return ()) <|> eof)
+    eofOrNewline = void (try newline) <|> eof
 
 instruction :: Opt -> Parser String Instruction
 instruction o = choice
@@ -128,9 +129,9 @@ operand o = choice
 
 -- This code is based on the Haskell parser, and thus strips a lot more
 -- whitespace than desired. [\na+2] probably shouldn't be valid assembly.
-brace o = case roundedBrackets $ options o of
-    True -> nesting . between (symbolic '(') (symbolic ')')
-    False -> brackets
+brace o = if roundedBrackets $ options o 
+    then nesting . between (symbolic '(') (symbolic ')')
+    else brackets
  
 word :: Opt -> Parser String Word
 word o = lexeme $ choice
@@ -140,9 +141,8 @@ word o = lexeme $ choice
   where
     definedLabel = do
         s <- labelName
-        case (s `V.elem` (optSymbols o)) of
-            True -> return ()
-            False -> err [] $ "label "++show s++" not defined"
+        unless (s `V.elem` optSymbols o) $
+            err [] $ "label "++show s++" not defined"
         return $ LabelAddr s
 
 
@@ -154,19 +154,19 @@ int = fromInteger <$> (num >>= checkSize)
         , decimal
         ]
     checkSize :: Integer -> Parser String Integer
-    checkSize n = case n>0xffff of
-        False -> return n
-        True -> do
-            warn [] $ msg
+    checkSize n = if n>0xffff 
+        then return n
+        else do
+            warn [] msg
             return (mod n 0xffff)
     msg = "literal wider than 16 bits, truncating to fit"
 
 
 sym o i tok = try $ i <$ token <* notFollowedBy labelChars <* spaces 
   where
-    token = case allowUppercase . options $ o of
-        True -> string tok <|> string (map toUpper tok)
-        False -> string tok
+    token = if allowUppercase . options $ o
+        then string tok <|> string (map toUpper tok)
+        else string tok
 
 register o = try $ choice
     [ sym o A "a", sym o B "b", sym o C "c"

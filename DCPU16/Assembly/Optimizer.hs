@@ -7,7 +7,7 @@ module DCPU16.Assembly.Optimizer
     ) where
 import DCPU16.Instructions
 import DCPU16.Instructions.Size
-import Data.Maybe (maybe)
+import Data.Maybe (fromMaybe)
 import Data.Word (Word16)
 import Data.ByteString
 import Data.Vector (Vector)
@@ -40,7 +40,7 @@ shortLabelLiterals is = rewriteBi f `V.map` is where
     f (DirectLiteral l@(LabelAddr s)) | addr s<=0x1f = Just $ ShortLiteral l
     f _ = Nothing
     addr :: ByteString -> Word16
-    addr s = maybe (error $ "undefined label "++show s) id (M.lookup s lut)
+    addr s = fromMaybe (error $ "undefined label "++show s) (M.lookup s lut)
     lut = M.fromList . snd $ V.foldl fun (0,[]) is where
         fun (addr,acc) (Label s) = (addr,(s,addr):acc)
         fun (addr,acc) i = (addr + size i, acc)

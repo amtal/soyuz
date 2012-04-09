@@ -28,10 +28,10 @@ pprint = render . V.foldl pI empty
 
 pI :: Doc -> Instruction -> Doc
 pI acc (Comment solo xs) 
-    | solo==False = acc $$ nest 40 (semi <> text xs)
-    | otherwise   = acc $+$ semi <> text xs
-pI acc (Label s)  = acc $$ colon <> text (unpack s)
-pI acc (Data x)   = acc $$ nest 16 (text "dat" <+> pW x)
+    | not solo   = acc $$ nest 40 (semi <> text xs)
+    | otherwise  = acc $+$ semi <> text xs
+pI acc (Label s) = acc $$ colon <> text (unpack s)
+pI acc (Data x)  = acc $$ nest 16 (text "dat" <+> pW x)
 pI acc (Basic op a b) = acc $$ nest 16 (pBO op <+> pO a <> comma <+> pO b)
 pI acc (NonBasic op a)= acc $$ nest 16 (pNBO op <+> pO a)
 

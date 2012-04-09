@@ -23,7 +23,6 @@ import Data.ByteString
 import Data.Serialize
 import Data.Bits
 import Data.Maybe (fromMaybe)
-import Data.Word hiding (Word)
 import Control.Applicative hiding (Const)
 
 -- | Abstract DCPU-16 instruction set.
@@ -105,7 +104,7 @@ instance Serialize Instruction where
         opCode = case op of JSR->0x01; Reserved x->0x3f.&.x
         putNonBasic op a = do 
             let (a',w) = packOp a
-            putWord16be $ shiftL ((shiftL a' 6) .|. op) 4
+            putWord16be $ shiftL (shiftL a' 6 .|. op) 4
             maybe (return ()) put w
     put (Data x) = put x
     put (Label s) = return ()
