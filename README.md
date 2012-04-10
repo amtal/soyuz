@@ -1,17 +1,9 @@
-Advanced utility library for the DCPU-16 architecture.
+СОЙУЗ
+-----
 
-To build, get the [Haskell Platform](http://hackage.haskell.org/platform/), then
+Advanced utility library for the DCPU-16 architecture. 
 
-    cabal install soyuz
-
-for the last release, or 
-
-    git clone git://github.com/amtal/soyuz.git; cd soyuz; cabal install
-
-for latest.
-
-Core Goals
-----------
+Core goals:
 
 * All outputs will be compatible with official tools, and follow any official specs.
 * Within that, go crazy with optimizations and features.
@@ -25,7 +17,7 @@ Command Line Tool
 There are three main modes. Currently, the most interesting one is for assembly.
 
 ```
-augur@niflheim:~/code/0x10c/soyuz$ ./soyuz --help
+$ ./soyuz --help
 Сойуз 0.0.0, amtal <alex.kropivny@gmail.com>
 
 soyuz [OPTIONS] <FILE>
@@ -44,11 +36,11 @@ General:
   -V --version          Print version information
 
 Documentation and source at https://github.com/amtal/soyuz or on Hackage.
-augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -a -h
+$ ./soyuz asm/notchspec.asm -a -h
 0000: 7c01 0030 7de1 1000 0020 7803 1000 c00d
 0008: ddc1 a861 7c01 2000 2161 2000 8463 806d
 0010: b1c1 9031 d410 ddc1 9037 61c1 ddc1
-augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -a -h --no-optimize
+$ ./soyuz asm/notchspec.asm -a -h --no-optimize
 0000: 7c01 0030 7de1 1000 0020 7803 1000 7c0d
 0008: 0010 7dc1 0021 7c61 000a 7c01 2000 2161
 0010: 2000 7c63 0001 7c6d 0000 7dc1 000f 7c31
@@ -59,8 +51,8 @@ augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -a -h --no-optimize
 The disassembler mode is straightforward. No heuristics to avoid mixed in dat instructions and other pitfalls - but it does add obvious labels.
 
 ```
-augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -a -o notch.bin
-augur@niflheim:~/code/0x10c/soyuz$ ./soyuz notch.bin -d
+$ ./soyuz asm/notchspec.asm -a -o notch.bin
+$ ./soyuz notch.bin -d
                 set a, 0x30
                 set [0x1000], 0x20
                 sub a, [0x1000]
@@ -83,7 +75,7 @@ augur@niflheim:~/code/0x10c/soyuz$ ./soyuz notch.bin -d
 Finally, pretty-print mode consistently re-formats the input.
 
 ```
-augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -p
+$ ./soyuz asm/notchspec.asm -p
 ; Try some basic stuff
                 set a, 0x30             ; 7c01 0030
                 set [0x1000], 0x20      ; 7de1 1000 0020
@@ -110,39 +102,16 @@ augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -p
 ```
 
 
+Installing Soyuz
+----------------
 
-Pretty Printer Example
-----------------------
+For the command line tool, either:
 
-```
-$ cat > fib.asm
-; Fibonacci filler from reddit
-SET A, 1
-SET B, 1
-SET PEEK, 1
-:loop ADD A, B ; A is now 2, B is still 1
-SET PUSH, A
-SET A, B
-SET B, PEEK
-IFG SP, 10 ; 10 because that's how much space 
-; this program takes 
-SET PC, loop
-$ soyuz -p fib.asm
-; Fibonacci filler from reddit
-                set a, 1
-                set b, 1
-                set peek, 1
-:loop           add a, b                ; A is now 2, B is still 1
-                set push, a
-                set a, b
-                set b, peek
-                ifg sp, 0xa             ; 10 because that's how much space 
-; this program takes 
-                set pc, loop
-$ soyuz -a fib.asm -h
-0000: 8401 8411 8591 0402 01a1 0401 6411 a9be
-0008: 8dc1
-```
+* Get a binary for [Ubuntu](https://github.com/downloads/amtal/soyuz/soyuz-0.0.0-ubuntu-32.tgz).
+* Build from source. Get the [Haskell Platform](http://hackage.haskell.org/platform/) and either:
+  * `cabal install soyuz` for 0.0.0 from Hackage
+  * `git clone git://github.com/amtal/soyuz.git; cd soyuz; cabal install` for HEAD
+
 
 
 Parser Error Messages
