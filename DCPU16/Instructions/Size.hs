@@ -15,6 +15,7 @@ size (Basic _ a b)  = 1 + ops a + ops b
 size (NonBasic _ a) = 2 + ops a
 size (Comment _ _) = 0
 size (Label _) = 0
+size (Data _) = 1
 
 -- | Operand size.
 ops :: Operand -> Word16
