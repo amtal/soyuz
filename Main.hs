@@ -77,7 +77,7 @@ options = Options
         &= explicit &= name "smooth-brackets"
         &= help "Parse (a) instead of [a] for indirect mode"
     } &= program "soyuz"
-      &= summary "soyuz 0.0.0, amtal <alex.kropivny@gmail.com>"
+      &= summary "Сойуз 0.0.0, amtal <alex.kropivny@gmail.com>"
       &= details
     [ "Documentation and source at https://github.com/amtal/soyuz or on Hackage."
     ]

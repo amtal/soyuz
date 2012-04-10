@@ -26,7 +26,7 @@ There are three main modes. Currently, the most interesting one is for assembly.
 
 ```
 augur@niflheim:~/code/0x10c/soyuz$ ./soyuz --help
-soyuz 0.0.0, amtal <alex.kropivny@gmail.com>
+Сойуз 0.0.0, amtal <alex.kropivny@gmail.com>
 
 soyuz [OPTIONS] <FILE>
 
