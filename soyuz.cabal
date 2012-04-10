@@ -11,7 +11,7 @@ description:
         Utilities for the DCPU-16 architecture, for Notch's upcoming space game, 0x10c.
         .
         Meant to be a library for implementing powerful tools. As demonstrations, contains
-        a command-line optimizing assembler/disassembler/pretty printer.
+        a command-line optimizing assembler\/disassembler\/pretty printer.
         .
         Core of the library is "DCPU16.Instructions". Everything else is built around it.
 build-type: Simple
