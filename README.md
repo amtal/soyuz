@@ -46,7 +46,7 @@ augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -a -h --no-optimize
 0020: 7dc1 0021
 ```
 
-The disassembler mode is straightforward. I'll add function/jump labeling soon, but heuristics to avoid mixed in dat instructions and other pitfalls will have to wait.
+The disassembler mode is straightforward. No heuristics to avoid mixed in dat instructions and other pitfalls - but it does add obvious labels.
 
 ```
 augur@niflheim:~/code/0x10c/soyuz$ ./soyuz asm/notchspec.asm -a -o notch.bin
@@ -58,16 +58,16 @@ augur@niflheim:~/code/0x10c/soyuz$ ./soyuz notch.bin -d
                 set pc, 0x17
                 set i, 0xa
                 set a, 0x2000
-                set [i], [0x2000+a]
+:jump.000c      set [i], [0x2000+a]
                 sub i, 1
                 ifn i, 0
                 set pc, 0xc
                 set x, 4
                 jsr 0x15
                 set pc, 0x17
-                shl x, 4
+:func.0015      shl x, 4
                 set pc, pop
-                set pc, 0x17
+:jump.0017      set pc, 0x17
 ```
 
 Finally, pretty-print mode consistently re-formats the input.
