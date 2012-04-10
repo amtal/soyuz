@@ -1,5 +1,9 @@
 Advanced utility library for the DCPU-16 architecture.
 
+To build, get the [Haskell Platform](http://hackage.haskell.org/platform/), then:
+
+    git clone git://github.com/amtal/soyuz.git; cd soyuz; cabal install
+
 Core Goals
 ----------
 
