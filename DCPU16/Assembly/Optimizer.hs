@@ -16,14 +16,29 @@ import Data.Vector (Vector)
 import qualified Data.Vector as V
 import Data.Generics.Uniplate.Data
 import qualified Data.Map as M
+import Data.Bits
 
 -- | Optimizations, listed in the order they're performed. (Earliest first.)
 data Optimization
+    -- | Rewrite power of two multiplies and divides as shifts.
+    --
+    -- > mul a,256      ; shl a,8 (one word shorter)
+    -- > mul a,16       ; untouched
+    -- > div a,128      ; shr,a,7
+    --
+    -- Multiply and shift are both two cycles. It should only be rewritten if
+    -- the original doesn't fit into into a short literal (removing a word-load
+    -- cycle).
+    --
+    -- Division is always rewritten, being 3 cycles long.
+    --
+    -- Effect on O should be identical.
+    = PowerOfTwoMulDiv
     -- | Shortens instructions by 1 word if they use literals smaller than 0x20.
     --
     -- > set a,1            ; 1 word, not 2
     -- > add [0x8000],1     ; 2 words, not 3
-    = ShortLiterals
+    | ShortLiterals
     -- | Performs the short literal optimization on labels.
     --
     -- > :l_0000    set pc,l.0000       ; 1 word, address < 0x20
@@ -46,12 +61,43 @@ sizeVariant :: Step
 sizeVariant = pipeline
     [(ShortLiterals, shortLiterals)
     ,(ShortLabelLiterals, shortLabelLiterals)
+    ,(PowerOfTwoMulDiv, mulDivP2)
     ]
+
 
 
 --
 -- Actual optimization implementations follow:
 --
+
+
+mulDivP2 :: Step
+mulDivP2 = V.map f where
+    f (Basic MUL a b) | isLit b && isPow2 b && lit b >= 0x20 
+        = Basic SHL a . DirectLiteral . Const . log2 $ b
+    f (Basic DIV a b) | isLit b && isPow2 b 
+        = Basic SHR a . DirectLiteral . Const . log2 $ b
+    f x = x
+    isPow2 o = isLit o && w.&.(w-1)==0 && w/=0 -- fast algorithm from wikipedia
+      where w = lit o
+    -- there are nice log2 algorithms at:
+    -- <http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious>
+    -- however I don't see anything I can implement cleanly :p
+    log2 = r 0 . lit  where 
+        r e 0 = e
+        r e n = r (e+1) (shiftR n 1)
+
+isLit :: Operand -> Bool
+isLit (DirectLiteral _) = True
+isLit (ShortLiteral _) = True
+isLit _ = False
+
+lit :: Operand -> Word16
+lit (DirectLiteral (Const w)) = w
+lit (ShortLiteral (Const w)) = w
+lit x = error $ "Not a literal: "++show x
+
+
 
 shortLiterals :: Vector Instruction -> Vector Instruction
 -- ^ Rewrite small constants to make the instructions one word shorter.
