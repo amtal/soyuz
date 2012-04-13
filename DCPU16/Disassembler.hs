@@ -82,7 +82,8 @@ extractLabels = snd . foldl f (0,[]) . V.toList where
         addr' = addr + size i
         acc' = accLabels acc addr' i
     -- labels extracted:
-    accLabels acc addr (NonBasic JSR l) = (lit l, Call):acc
+    accLabels acc addr (NonBasic JSR l) | isLit l = 
+        (lit l, Call):acc
     accLabels acc addr (Basic SET PC l) | isLit l = 
         (lit l, DirectJump):acc
     accLabels acc addr (Basic ADD PC l) | isLit l = 
@@ -96,6 +97,7 @@ extractLabels = snd . foldl f (0,[]) . V.toList where
     isLit _ = False
     lit (DirectLiteral (Const w)) = w
     lit (ShortLiteral (Const w)) = w
+    lit x = error $ "Not a literal: "++show x
 
 -- | Insert labels.
 --
