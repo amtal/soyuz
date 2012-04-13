@@ -103,9 +103,9 @@ shortLiterals :: Vector Instruction -> Vector Instruction
 -- ^ Rewrite small constants to make the instructions one word shorter.
 --
 -- Only works for literals <=32.
-shortLiterals = V.map (rewriteBi f) where
-    f (DirectLiteral c@(Const w)) | w<=0x1f = Just $ ShortLiteral c
-    f _ = Nothing
+shortLiterals = V.map (transformBi f) where
+    f (DirectLiteral c@(Const w)) | w<=0x1f = ShortLiteral c
+    f x = x
 
 shortLabelLiterals :: Vector Instruction -> Vector Instruction
 -- ^ Rewrite small label addresses to make instructions one word shorter.
@@ -113,9 +113,9 @@ shortLabelLiterals :: Vector Instruction -> Vector Instruction
 -- Only works for addresses <=32 (not many) and vulnerable to size changes.
 --
 -- Should probably be one of the last steps.
-shortLabelLiterals is = rewriteBi f `V.map` is where
-    f (DirectLiteral l@(LabelAddr s)) | addr s<=0x1f = Just $ ShortLiteral l
-    f _ = Nothing
+shortLabelLiterals is = transformBi f `V.map` is where
+    f (DirectLiteral l@(LabelAddr s)) | addr s<=0x1f = ShortLiteral l
+    f x = x
     addr :: ByteString -> Word16
     addr s = fromMaybe (error $ "undefined label "++show s) (M.lookup s lut)
     lut = M.fromList . snd $ V.foldl fun (0,[]) is where
