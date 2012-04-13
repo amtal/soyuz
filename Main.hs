@@ -35,7 +35,9 @@ main = do
         case instr of
             Just is -> return is
             Nothing -> exitFailure -- parser already printed messages
-    optimize opts is = if noOptimization opts then is else sizeVariant is
+    optimize opts is = if runMode opts/=Assemble || noOptimization opts 
+        then is 
+        else sizeVariant is
     processOutput opts instr = case runMode opts of
         Assemble -> binEncoding . assemble $ instr
         _ -> packNlEof $ pprint instr
