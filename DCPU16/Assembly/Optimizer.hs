@@ -20,7 +20,16 @@ import Data.Bits
 
 -- | Optimizations, listed in the order they're performed. (Earliest first.)
 data Optimization
-    -- | Rewrite power of two multiplies and divides as shifts.
+    -- | Large number (0xFFF0+) addition overflow into subtraction.
+    --
+    -- Rewrites add into sub, and sub into add, if the number is large enough
+    -- to be represented as a short literal (<0x20) in the inverse.
+    --
+    -- Caution: behaviour of the Overflow register changes significantly. The
+    -- optimization saves 1 word of space (and the associated cycle), but will
+    -- probably be default-off.
+    = AddSubOverflow
+    -- | Rewrites power of two multiplies and divides as shifts.
     --
     -- > mul a,256      ; shl a,8 (one word shorter)
     -- > mul a,16       ; untouched
@@ -33,7 +42,7 @@ data Optimization
     -- Division is always rewritten, being 3 cycles long.
     --
     -- Effect on O should be identical.
-    = PowerOfTwoMulDiv
+    | PowerOfTwoMulDiv
     -- | Shortens instructions by 1 word if they use literals smaller than 0x20.
     --
     -- > set a,1            ; 1 word, not 2
@@ -59,9 +68,10 @@ pipeline = foldl1 (flip (.)) . map snd
 -- Should be run before label-to-address translation.
 sizeVariant :: Step
 sizeVariant = pipeline
-    [(ShortLiterals, shortLiterals)
-    ,(ShortLabelLiterals, shortLabelLiterals)
+    [(AddSubOverflow, addSubOverflow)
     ,(PowerOfTwoMulDiv, mulDivP2)
+    ,(ShortLiterals, shortLiterals)
+    ,(ShortLabelLiterals, shortLabelLiterals)
     ]
 
 
@@ -70,6 +80,14 @@ sizeVariant = pipeline
 -- Actual optimization implementations follow:
 --
 
+
+addSubOverflow :: Step
+addSubOverflow = V.map f where
+    f (Basic op a b) | (op==ADD || op==SUB) && isLit b && lit b >= 0xffe1 
+        = Basic (switch op) a . DirectLiteral . Const $ 0 - lit b
+    f x = x
+    switch ADD = SUB
+    switch SUB = ADD
 
 mulDivP2 :: Step
 mulDivP2 = V.map f where
