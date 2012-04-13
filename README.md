@@ -119,21 +119,32 @@ Parser Error Messages
 
 No really, they're quite nice. They're even coloured!*
 
+Here, valid label characters are explained:
+
 ```
-*DCPU16.Assembler.Parser> parseFile "test.masm"
+tasm/opt.asm:2:3: error: label definition "a" clashes with register name, expected: ".",
+    "_", letter or digit
+:a 
+  ^
+```
+
+Again, pretty specific about what's expected:
+
+```
 test.masm:2:19: error: expected: "0", "[",
     "a", "b", "c", "i", "j", "o", "pc", "peek",
     "pop", "push", "sp", "x", "y", "z", digit,
     letter or digit
               set #a, 0x30              ; 7c01 0030 
                   ^                                 
-Nothing
-*DCPU16.Assembler.Parser> parseFile "lower.masm"
+```
+
+No stupid mistakes allowed:
+
+```
 lower.masm:14:29: error: label "lop" not defined
                  set pc, lop          ; 7dc1 000d [*] 
                             ^                         
-Nothing
-*DCPU16.Assembler.Parser> 
 ```
 
 * No colour visible in copy-pastes.

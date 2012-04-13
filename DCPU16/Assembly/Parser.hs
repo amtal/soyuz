@@ -21,7 +21,7 @@ import Data.Vector (Vector)
 import Data.Word (Word16)
 import qualified Data.Vector as V
 import Data.Char (toUpper)
-import Control.Monad (void,unless)
+import Control.Monad (void,unless,when)
 import Text.Printf
 
 -- | Default parsing options.
@@ -52,8 +52,10 @@ data Opt = Opt
 -- Detailed  errors with line and column numbers (as well as expected values)
 -- will be printed to console if parsing fails.
 parseFile opt f = do
-    (Just syms) <- parseFromFile symbolDefs f
-    parseFromFile (asm (Opt syms opt)) f
+    ss <- parseFromFile symbolDefs f 
+    case ss of
+        (Just syms) -> parseFromFile (asm (Opt syms opt)) f
+        Nothing -> return Nothing
 
 
 symbolDefs :: Parser String (Vector ByteString)
@@ -88,7 +90,19 @@ end = eof <?> "comment, end of file, or valid instruction"
 -- later.
 dat o = Data <$ symbol "dat" <*> word o
 
-label = Label <$ char ':' <*> labelName <* spaces
+label = do
+    char ':' 
+    l<-labelName 
+    when (isRegName (B.unpack l)) $
+      err [] $ "label definition "++show l++" clashes with register name"
+    spaces
+    return $ Label l
+  where
+    isRegName :: String -> Bool
+    isRegName s = map toUpper s `elem` regs
+    regs = ["A","B","C","X","Y","Z","I","J"
+           ,"POP","PEEK","PUSH","PC","O"
+           ]
 
 labelName = B.pack `fmap` some labelChars
 
