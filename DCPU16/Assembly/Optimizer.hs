@@ -20,14 +20,17 @@ import Data.Bits
 
 -- | Optimizations, listed in the order they're performed. (Earliest first.)
 data Optimization
-    -- | Large number (0xFFF0+) addition overflow into subtraction.
+    -- | Large number (0xffe1+) add\<-\>sub overflow.
     --
-    -- Rewrites add into sub, and sub into add, if the number is large enough
-    -- to be represented as a short literal (<0x20) in the inverse.
+    -- Saves 1 word of space when adding/subtracting large numbers.
     --
-    -- Caution: behaviour of the Overflow register changes significantly. The
-    -- optimization saves 1 word of space (and the associated cycle), but will
-    -- probably be default-off.
+    -- > add a,0xffff   ; sub,a,1
+    -- > add a,0xffe1   ; sub a,0x1f
+    -- > add a,0xffe0   ; no longer fits into short literal
+    -- > sub a,0xffff   ; add a,1 (trivial dual)
+    --
+    -- Caution: O register behaves very differently. As such, this optimization
+    -- is default-off.
     = AddSubOverflow
     -- | Rewrites power of two multiplies and divides as shifts.
     --
