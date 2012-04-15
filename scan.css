@@ -1,0 +1,41 @@
+body {
+font-family:"Courier New";
+color:#00f;
+background-color:#000;
+text-align:center;
+font-size:200%;
+}
+
+article { /* make zooming not be annoyed by borders */
+    text-align:left;
+    margin-left:05em;
+    margin-right:05em;
+}
+
+table {
+    text-align:left;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+td { 
+    color:#fff;
+    padding-left:0.5em;
+    padding-right:0.5em;
+}
+
+tr {
+    border-bottom:1px solid #00f;
+}
+
+td h2 {
+    float: left;
+}
+
+.lvl1 {
+    font-size:25%
+}
+
+a {
+    color:#fff
+}

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Scanner</title>
+        <link rel="stylesheet" type="text/css" href="scan.css"/>
+        <script src="sorttable.js"></script>
+    </head>
+
+    <body>
+        <article>
+            <h1>SCANNER</h1>
+                <table class="sortable">
+                    <thead>
+                        <tr>
+                            <th scope="col">lock</th>
+                            <th scope="col">bearing</th>
+                            <th scope="col">heading</th>
+                            <th scope="col">info</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <body>
+                        <tr>
+                            <td>ANGLE</td>
+                            <td>7'0'527km</td>
+                            <td>0'0'0m/s</td>
+                            <td class="lvl1">
+                                <p>size: 32kkm</p>
+                                <p>transponder: Earth</p>
+                                <p>IFF: ?</p>
+                            </td>
+                            <td class="lvl1">
+                                <p>
+                                    <a href="#foo">!weapons</a>
+                                    <a href="#foo">!navigator</a>
+                                </p>
+                                <p>
+                                    <a href="#foo">scan</a>
+                                    <a href="#foo">hail</a>
+                                    <a href="#foo">jam</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </body>
+                    <body>
+                        <tr>
+                            <td>ON</td>
+                            <td>3'0'632kkm</td>
+                            <td>6'0'8km/s</td>
+                            <td class="lvl1">
+                                <p>size: 6kkm</p>
+                                <p>transponder: Moon</p>
+                                <p>IFF: ?</p>
+                            </td>
+                            <td class="lvl1">
+                                <p>
+                                    <a href="#foo">!weapons</a>
+                                    <a href="#foo">!navigator</a>
+                                </p>
+                                <p>
+                                    <a href="#foo">scan</a>
+                                    <a href="#foo">hail</a>
+                                    <a href="#foo">jam</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </body>
+                    <body>
+                        <tr>
+                            <td>LOST</td>
+                            <td>2'2'15km</td>
+                            <td>10'10'200m/s</td>
+                            <td class="lvl1">
+                                <p>size: 52m</p>
+                                <p>transponder: ?</p>
+                                <p>IFF: FOE</p>
+                            </td>
+                            <td class="lvl1">
+                                <p>
+                                    <a href="#foo">!weapons</a>
+                                    <a href="#foo">!navigator</a>
+                                </p>
+                                <p>
+                                    <a href="#foo">scan</a>
+                                    <a href="#foo">hail</a>
+                                    <a href="#foo">jam</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </body>
+
+                </table>
+            </article>
+
+        <article>
+            <h1>NAVIGATION</h1>
+                <table class="sortable">
+                    <thead>
+                        <tr>
+                            <th scope="col">lock</th>
+                            <th scope="col">bearing</th>
+                            <th scope="col">heading</th>
+                            <th scope="col">tx</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <body>
+                        <tr>
+                            <td>ANGLE</td>
+                            <td>7'0'527km</td>
+                            <td>0'0'0m/s</td>
+                            <td>Earth</td>
+                            <td class="lvl1">
+                                <p>
+                                    <a href="#foo">towards</a>
+                                    <a href="#foo">away</a>
+                                    <a href="#foo">match</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </body>
+                    <body>
+                        <tr>
+                            <td>ON</td>
+                            <td>3'0'632kkm</td>
+                            <td>6'0'8km/s</td>
+                            <td>Moon</td>
+                            <td class="lvl1">
+                                <p>
+                                    <a href="#foo">towards</a>
+                                    <a href="#foo">away</a>
+                                    <a href="#foo">match</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </body>
+                    <body>
+                        <tr>
+                            <td>LOST</td>
+                            <td>2'2'15km</td>
+                            <td>10'10'200m/s</td>
+                            <td>?</td>
+                            <td class="lvl1">
+                                <p>
+                                    <a href="#foo">towards</a>
+                                    <a href="#foo">away</a>
+                                    <a href="#foo">match</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </body>
+
+                </table>
+
+                <h2>DeltaV</h2>
+
+                <input type="range" value="0" min="0" max="1000" onchange="updateDV(this.value)"/>
+                <span id="deltaV">0</span>
+                <select>
+                    <option>m/s</option>
+                    <option>km/s</option>
+                </select>
+                <script type="text/javascript">
+                    function updateDV(x) {
+                        document.getElementById("deltaV").innerHTML=x
+                    }
+                </script>
+
+            </article>
+    </body>
+</html>
